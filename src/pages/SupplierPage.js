@@ -19,6 +19,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import SUPPLIERLIST from '../_mock/suppliers';
 import Iconify from '../components/iconify';
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
@@ -78,6 +79,8 @@ export default function SupplierPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const navigate = useNavigate();
+
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
@@ -130,6 +133,10 @@ export default function SupplierPage() {
     setFilterName(event.target.value);
   };
 
+  const handleOnclick = () => {
+    navigate('/create-supplier');
+  };
+
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - SUPPLIERLIST.length) : 0;
 
   const filteredUsers = applySortFilter(SUPPLIERLIST, getComparator(order, orderBy), filterName);
@@ -147,7 +154,7 @@ export default function SupplierPage() {
           <Typography variant="h4" gutterBottom>
             Nhà cung cấp
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
+          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOnclick}>
             Thêm nhà cung cấp
           </Button>
         </Stack>
