@@ -10,6 +10,8 @@ import React, {useState} from "react"
 import {Helmet} from "react-helmet-async";
 import {DataGrid} from '@mui/x-data-grid';
 import TextField from '@mui/material/TextField';
+import Grid from '@mui/material/Unstable_Grid2';
+import {FormContainer, TextFieldElement} from 'react-hook-form-mui'
 import Iconify from "../components/iconify";
 
 const columns = [
@@ -85,7 +87,7 @@ const InputNewItem = () => (
                         fullWidth
                         variant="standard"
                     />
-                    <Button>Thêm</Button>
+                    <Button variant="contained" fullWidth style={{marginTop: "14px"}}>Thêm</Button>
                 </div>
             </Box>
         </>
@@ -109,29 +111,34 @@ export default function InvoicePage() {
                 <title> Tạo hoá đơn bán | Material Management </title>
             </Helmet>
             <Modal open={openAdd} children={<InputNewItem/>} onClose={() => setOpenAdd(!openAdd)}/>
-            <Container>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-                    <Typography variant="h4" gutterBottom>
-                        Tạo hoá đơn bán
-                    </Typography>
-                    <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill"/>}
-                            onClick={() => setOpenAdd(!openAdd)}>
-                        Thêm sản phẩm
-                    </Button>
-                </Stack>
-                <Box sx={{height: 400}}>
-                    <DataGrid
-                        rows={rowData}
-                        columns={columns}
-                        initialState={{
-                            pagination: {
-                                paginationModel: {page: 0, pageSize: 5},
-                            },
-                        }}
-                        pageSizeOptions={[5, 10]}
-                    />
-                </Box>
-            </Container>
+            <Grid container spacing={2}>
+                <Grid xs={8}>
+                    <>
+                        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+                            <Typography variant="h4" gutterBottom>
+                                Tạo hoá đơn bán
+                            </Typography>
+                            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill"/>}
+                                    onClick={() => setOpenAdd(!openAdd)}>
+                                Thêm sản phẩm
+                            </Button>
+                        </Stack>
+                        <Box sx={{height: 400}}>
+                            <DataGrid
+                                rows={rowData}
+                                columns={columns}
+                                initialState={{
+                                    pagination: {
+                                        paginationModel: {page: 0, pageSize: 5},
+                                    },
+                                }}
+                                pageSizeOptions={[5, 10]}
+                            />
+                        </Box>
+                    </>
+                </Grid>
+                <Grid xs={4}>Test</Grid>
+            </Grid>
         </>
     )
 }
