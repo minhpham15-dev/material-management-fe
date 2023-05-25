@@ -133,7 +133,7 @@ export default function SupplierPage() {
     setFilterName(event.target.value);
   };
 
-  const handleOnclick = () => {
+  const handleCreateClick = () => {
     navigate('/create-supplier');
   };
 
@@ -146,7 +146,7 @@ export default function SupplierPage() {
   return (
     <>
       <Helmet>
-        <title> Nhà cung cấp | Material Management </title>
+        <title> Quản lý nhà cung cấp | Material Management </title>
       </Helmet>
 
       <Container>
@@ -154,8 +154,8 @@ export default function SupplierPage() {
           <Typography variant="h4" gutterBottom>
             Nhà cung cấp
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOnclick}>
-            Thêm nhà cung cấp
+          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleCreateClick}>
+            Thêm mới
           </Button>
         </Stack>
 

@@ -14,6 +14,7 @@ import InvoiceListPage from './pages/InvoiceListPage';
 import InputInvoiceListPage from './pages/InputInvoiceListPage';
 import InvoicePage from './pages/InvoicePage';
 import CreateSupplierPage from './pages/CreateSupplierPage';
+import CreateProductPage from './pages/CreateProductPage';
 
 // ----------------------------------------------------------------------
 
@@ -56,6 +57,10 @@ export default function Router() {
     {
       path: 'create-supplier',
       element: <CreateSupplierPage />,
+    },
+    {
+      path: 'create-product',
+      element: <CreateProductPage />,
     },
   ]);
 
