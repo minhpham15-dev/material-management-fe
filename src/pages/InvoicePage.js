@@ -10,6 +10,8 @@ import React, {useState} from "react"
 import {Helmet} from "react-helmet-async";
 import {DataGrid} from '@mui/x-data-grid';
 import TextField from '@mui/material/TextField';
+import Grid from '@mui/material/Unstable_Grid2';
+import {FormContainer, TextFieldElement} from 'react-hook-form-mui'
 import Iconify from "../components/iconify";
 
 const columns = [
@@ -40,52 +42,17 @@ const InputNewItem = () => (
                 p: 4,
             }}>
                 <div style={{margin: "auto", backgroundColor: "white", padding: "14px"}}>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="name"
-                        label="Tên"
-                        type="name"
-                        fullWidth
-                        variant="standard"
-                    />
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="amount"
-                        label="Số lượng"
-                        type="name"
-                        fullWidth
-                        variant="standard"
-                    />
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="currency"
-                        label="Đơn vị"
-                        type="name"
-                        fullWidth
-                        variant="standard"
-                    />
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="vat"
-                        label="Thuế"
-                        type="name"
-                        fullWidth
-                        variant="standard"
-                    />
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="money"
-                        label="Thành tiền"
-                        type="name"
-                        fullWidth
-                        variant="standard"
-                    />
-                    <Button>Thêm</Button>
+                    <FormContainer
+                        defaultValues={{name: ''}}
+                        onSuccess={data => console.log(data)}
+                    >
+                        <TextFieldElement name="name" label="Tên" required fullWidth/> <br />
+                        <TextFieldElement name="amount" label="Số lượng" required fullWidth style={{marginTop: "14px"}}/><br />
+                        <TextFieldElement name="currency" label="Đơn vị" required fullWidth style={{marginTop: "14px"}}/><br />
+                        <TextFieldElement name="vat" label="Thuế" required fullWidth style={{marginTop: "14px"}}/> <br />
+                        <TextFieldElement name="money" label="Thành tiền" required fullWidth style={{marginTop: "14px"}}/> <br />
+                        <Button type={'submit'} variant="contained" fullWidth style={{marginTop: "14px"}}>Thêm</Button>
+                    </FormContainer>
                 </div>
             </Box>
         </>
@@ -109,29 +76,46 @@ export default function InvoicePage() {
                 <title> Tạo hoá đơn bán | Material Management </title>
             </Helmet>
             <Modal open={openAdd} children={<InputNewItem/>} onClose={() => setOpenAdd(!openAdd)}/>
-            <Container>
-                <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-                    <Typography variant="h4" gutterBottom>
-                        Tạo hoá đơn bán
-                    </Typography>
-                    <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill"/>}
-                            onClick={() => setOpenAdd(!openAdd)}>
-                        Thêm sản phẩm
-                    </Button>
-                </Stack>
-                <Box sx={{height: 400}}>
-                    <DataGrid
-                        rows={rowData}
-                        columns={columns}
-                        initialState={{
-                            pagination: {
-                                paginationModel: {page: 0, pageSize: 5},
-                            },
-                        }}
-                        pageSizeOptions={[5, 10]}
-                    />
-                </Box>
-            </Container>
+            <Grid container spacing={2}>
+                <Grid xs={8}>
+                    <>
+                        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+                            <Typography variant="h4" gutterBottom>
+                                Tạo hoá đơn bán
+                            </Typography>
+                            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill"/>}
+                                    onClick={() => setOpenAdd(!openAdd)}>
+                                Thêm sản phẩm
+                            </Button>
+                        </Stack>
+                        <Box sx={{height: 400}}>
+                            <DataGrid
+                                rows={rowData}
+                                columns={columns}
+                                initialState={{
+                                    pagination: {
+                                        paginationModel: {page: 0, pageSize: 5},
+                                    },
+                                }}
+                                pageSizeOptions={[5, 10]}
+                            />
+                        </Box>
+                    </>
+                </Grid>
+                <Grid xs={4}>
+                    <FormContainer
+                        defaultValues={{name: ''}}
+                        onSuccess={data => console.log(data)}
+                    >
+                        <TextFieldElement name="name" label="Tên khách hàng" required fullWidth/> <br />
+                        <TextFieldElement name="phone" label="Số ĐT" required fullWidth style={{marginTop: "14px"}}/><br />
+                        <TextFieldElement name="address" label="Địa chỉ" required fullWidth style={{marginTop: "14px"}}/><br />
+                        <TextFieldElement name="code" label="Mã hoá đơn" required fullWidth style={{marginTop: "14px"}}/> <br />
+                        <Button type={'submit'} variant={'contained'} color={'primary'} style={{marginTop: "14px"}}>Lưu và in</Button>
+                        <Button variant={'contained'} color={'error'} style={{margin: "14px 0 0 14px"}}>Huỷ bỏ</Button>
+                    </FormContainer>
+                </Grid>
+            </Grid>
         </>
     )
 }
