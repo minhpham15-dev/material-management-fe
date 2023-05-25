@@ -1,23 +1,32 @@
 import { Helmet } from 'react-helmet-async';
 import { Button, Card, Container, Stack, Typography } from '@mui/material';
-import { FormContainer, TextFieldElement } from 'react-hook-form-mui';
+import { FormContainer, SelectElement, TextFieldElement } from 'react-hook-form-mui';
 import { useNavigate } from 'react-router-dom';
 
-export default function CreateSupplierPage() {
+export default function CreateProductPage() {
   const navigate = useNavigate();
+
+  const productTypeList = [
+    { id: 1, label: 'Tròn' },
+    { id: 2, label: 'Chữ Y' },
+    { id: 3, label: 'Hộp' },
+  ];
+  const categoryList = [
+    { id: 1, label: 'Sắt' },
+    { id: 2, label: 'Nhôm' },
+    { id: 3, label: 'Thép' },
+  ];
   const handleBackClick = () => {
     navigate(-1);
   };
   return (
     <>
-      <Helmet>
-        <title>Thêm mới nhà cung cấp</title>
-      </Helmet>
+      <Helmet>Thêm mới nguyên vật liệu</Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Thêm nhà cung cấp
+            Thêm mới nguyên vật liệu
           </Typography>
         </Stack>
         <Card>
@@ -25,6 +34,7 @@ export default function CreateSupplierPage() {
             onSuccess={(data) => {
               console.log(data);
             }}
+            defaultValues={{ category: '' }}
           >
             <Stack direction="row" alignItems="flex-start" justifyContent="space-around" mt={5}>
               <Stack
@@ -33,10 +43,10 @@ export default function CreateSupplierPage() {
                 justifyContent="space-between"
                 spacing={{ xs: 1, sm: 2, md: 4 }}
               >
-                <TextFieldElement name="name" label="Tên nhà cung cấp" required />
-                <TextFieldElement name="email" label="Email" required />
-                <TextFieldElement name="address" label="Địa chỉ" required />
-                <TextFieldElement name="phoneNumber" label="Số điện thoại" required />
+                <TextFieldElement name="name" label="Tên nguyên vật liệu" required />
+                <SelectElement name="category" label="Loại mặt hàng" options={categoryList} required />
+                <SelectElement name="productType" label="Phân loại" options={productTypeList} required />
+                <TextFieldElement name="tax" label="Thuế(%)" required />
               </Stack>
 
               <Stack
@@ -46,8 +56,6 @@ export default function CreateSupplierPage() {
                 spacing={{ xs: 1, sm: 2, md: 4 }}
               >
                 <TextFieldElement name="taxCode" label="Mã số thuế" required />
-                <TextFieldElement name="representative" label="Người đại diện" required />
-                <TextFieldElement name="representativePhoneNumber" label="Số điện thoại người đại diện" required />
               </Stack>
             </Stack>
             <Stack direction="row" alignItems="center" justifyContent="space-around" mb={2} mt={5}>

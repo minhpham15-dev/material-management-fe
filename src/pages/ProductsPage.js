@@ -22,6 +22,7 @@ import {
   Typography,
 } from '@mui/material';
 // components
+import { useNavigate } from 'react-router-dom';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
@@ -87,6 +88,8 @@ export default function ProductsPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const navigate = useNavigate();
+
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
   };
@@ -139,6 +142,10 @@ export default function ProductsPage() {
     setFilterName(event.target.value);
   };
 
+  const handleCreateClick = () => {
+    navigate('/create-product');
+  };
+
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - PRODUCTLIST.length) : 0;
 
   const filteredUsers = applySortFilter(PRODUCTLIST, getComparator(order, orderBy), filterName);
@@ -156,8 +163,8 @@ export default function ProductsPage() {
           <Typography variant="h4" gutterBottom>
             Quản lý nguyên vật liệu
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            Thêm sản phẩm mới
+          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleCreateClick}>
+            Thêm mới
           </Button>
         </Stack>
 
@@ -180,7 +187,6 @@ export default function ProductsPage() {
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     const { id, name, amount, tax, price, supplier, productType, imgUrl } = row;
                     const selectedUser = selected.indexOf(name) !== -1;
-                    console.log(name, amount, tax, price, supplier, productType);
                     return (
                       <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
                         <TableCell padding="checkbox">
