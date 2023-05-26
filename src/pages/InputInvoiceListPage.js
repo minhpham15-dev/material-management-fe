@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // @mui
 import {
   Button,
@@ -28,6 +28,7 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 import INPUTINVOICELIST from '../_mock/inputInvoice';
 import { ButtonAdd } from '../components/button/create-button/ButtonAdd';
+import { axiosClient } from '../utils/axiosClient';
 
 // ----------------------------------------------------------------------
 
@@ -144,7 +145,10 @@ export default function InputInvoiceListPage() {
   const filteredUsers = applySortFilter(INPUTINVOICELIST, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
-
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    axiosClient.get('/api/input-invoices').then((res) => setData(res.data.data));
+  }, []);
   return (
     <>
       <Helmet>
@@ -175,8 +179,9 @@ export default function InputInvoiceListPage() {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, idInvoice, createdAt, supplier, paymentMethod, total, deliverName } = row;
+                  {data.map((row) => {
+                    console.log(row);
+                    const { id, created_at, supplier_id, payment_method, total, deliver_name } = row;
                     const selectedUser = selected.indexOf(idInvoice) !== -1;
                     return (
                       <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
@@ -184,15 +189,15 @@ export default function InputInvoiceListPage() {
                           <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, idInvoice)} />
                         </TableCell>
 
-                        <TableCell align="left">{idInvoice}</TableCell>
+                        <TableCell align="left">{id}</TableCell>
 
-                        <TableCell align="left">{createdAt}</TableCell>
+                        <TableCell align="left">{created_at}</TableCell>
 
-                        <TableCell align="left">{supplier}</TableCell>
+                        <TableCell align="left">{supplier_id}</TableCell>
 
-                        <TableCell align="left">{deliverName}</TableCell>
+                        <TableCell align="left">{deliver_name}</TableCell>
 
-                        <TableCell align="left">{paymentMethod}</TableCell>
+                        <TableCell align="left">{payment_method}</TableCell>
 
                         <TableCell align="center">{total}</TableCell>
 

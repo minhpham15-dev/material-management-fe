@@ -3,7 +3,9 @@ import { Button, Card, Container, Stack, Typography } from '@mui/material';
 import { FormContainer, SelectElement, TextFieldElement } from 'react-hook-form-mui';
 import { useNavigate } from 'react-router-dom';
 
+import { useState, useEffect } from 'react';
 import SUPPLIERLIST from '../_mock/suppliers';
+import { axiosClient } from '../utils/axiosClient';
 
 export default function CreateProductPage() {
   const navigate = useNavigate();
@@ -24,6 +26,10 @@ export default function CreateProductPage() {
   const handleBackClick = () => {
     navigate(-1);
   };
+  const [units, setUnits] = useState([]);
+  useEffect(() => {
+    axiosClient.get('/api/units').then((res) => setUnits(res.data.data.map((v) => ({ ...v, label: v.name }))));
+  }, []);
   return (
     <>
       <Helmet>Thêm mới nguyên vật liệu</Helmet>
@@ -38,6 +44,13 @@ export default function CreateProductPage() {
           <FormContainer
             onSuccess={(data) => {
               console.log(data);
+              axiosClient.post('/api/products', {
+                category_id: data.category,
+                name: data.name,
+                unit_id: data.unit,
+                brand_name: data.supplier,
+                tax: data.tax,
+              });
             }}
           >
             <Stack direction="row" alignItems="flex-start" justifyContent="space-around" mt={5}>
@@ -50,6 +63,7 @@ export default function CreateProductPage() {
                 <TextFieldElement name="name" label="Tên nguyên vật liệu" required />
                 <SelectElement name="category" label="Loại mặt hàng" options={categoryList} required />
                 <SelectElement name="productType" label="Phân loại" options={productTypeList} required />
+                <SelectElement name="unit" label="Đơn vị" options={units} required />
                 <TextFieldElement name="tax" label="Thuế(%)" required />
               </Stack>
 
