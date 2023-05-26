@@ -3,7 +3,6 @@ import { Navigate, useRoutes } from 'react-router-dom';
 import DashboardLayout from './layouts/dashboard';
 import SimpleLayout from './layouts/simple';
 //
-import BlogPage from './pages/BlogPage';
 import EmployeePage from './pages/EmployeePage';
 import LoginPage from './pages/LoginPage';
 import Page404 from './pages/Page404';
@@ -16,33 +15,47 @@ import InvoicePage from './pages/InvoicePage';
 import CreateSupplierPage from './pages/CreateSupplierPage';
 import CreateProductPage from './pages/CreateProductPage';
 import CreateEmployeePage from './pages/CreateEmployeePage';
+import InputInvoicePage from "./pages/InputInvoicePage";
+import {Role} from "./utils/role";
+import ProfilePage from "./pages/ProfilePage";
 
 // ----------------------------------------------------------------------
 
 export default function Router() {
+  const role = localStorage.getItem("role")
+  const token = localStorage.getItem("token")
   const routes = useRoutes([
     {
-      path: '/dashboard',
-      element: <DashboardLayout />,
+      path: '/',
+      element: token ? <DashboardLayout /> :<Navigate to="/login"/>,
       children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
-        { path: 'app', element: <DashboardAppPage /> },
-        { path: 'user', element: <EmployeePage /> },
+        { element: <Navigate to="/home" />, index: true },
+        { path: 'home', element: <DashboardAppPage /> },
+          ... role === Role.ADMIN ? [{ path: 'user', element: <EmployeePage /> }, {
+            path: 'create-employee',
+            element: <CreateEmployeePage />,
+          },]  : [],
         { path: 'products', element: <ProductsPage /> },
-        { path: 'blog', element: <BlogPage /> },
         {
           path: 'suppliers',
           element: <SupplierPage />,
-          // children: [
-          //   {
-          //     path: 'create-supplier',
-          //     element: <CreateSupplierPage />,
-          //   },
-          // ],
         },
         { path: 'invoices-list', element: <InvoiceListPage /> },
         { path: 'input-invoices-list', element: <InputInvoiceListPage /> },
+        { path: 'input-invoice', element: <InputInvoicePage /> },
         { path: 'invoice', element: <InvoicePage /> },
+        {
+          path: 'create-supplier',
+          element:token ? <CreateSupplierPage /> :<Navigate to="/login"/>,
+        },
+        {
+          path: 'create-product',
+          element: token ? <CreateProductPage /> :<Navigate to="/login"/>,
+        },
+        {
+          path: 'profile',
+          element: <ProfilePage />
+        }
       ],
     },
     {
@@ -52,7 +65,7 @@ export default function Router() {
     {
       element: <SimpleLayout />,
       children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
+        { element: <Navigate to="/home" />, index: true },
         { path: '404', element: <Page404 /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],
@@ -60,18 +73,6 @@ export default function Router() {
     {
       path: '*',
       element: <Navigate to="/404" replace />,
-    },
-    {
-      path: 'create-supplier',
-      element: <CreateSupplierPage />,
-    },
-    {
-      path: 'create-product',
-      element: <CreateProductPage />,
-    },
-    {
-      path: 'create-employee',
-      element: <CreateEmployeePage />,
     },
   ]);
 
