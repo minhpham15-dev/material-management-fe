@@ -41,7 +41,11 @@ const navConfig = [
     path: '/dashboard/invoice',
     icon: icon('ic_cart'),
   },
-
+  {
+    title: 'Tạo hóa đơn nhập',
+    path: '/dashboard/input-invoice',
+    icon: icon('ic_cart'),
+  },
   // {
   //   title: 'blog',
   //   path: '/dashboard/blog',
