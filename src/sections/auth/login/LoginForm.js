@@ -21,7 +21,7 @@ export default function LoginForm() {
         localStorage.setItem("token", res.data.data.access_token.token)
         const resRole = await axiosClient.get("/api/profile")
         localStorage.setItem("role", resRole.data.data.role)
-        navigate('/dashboard', { replace: true });
+        navigate('/home', { replace: true });
     };
 
     return (

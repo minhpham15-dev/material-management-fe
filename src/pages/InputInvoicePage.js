@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Helmet} from "react-helmet-async";
 import {Autocomplete, Box, Button, IconButton, Modal, Stack, TextField, Typography} from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import {DataGrid} from "@mui/x-data-grid";
+import {DataGrid, GridActionsCellItem} from "@mui/x-data-grid";
 import {
     AutocompleteElement,
     FormContainer,
@@ -12,26 +12,11 @@ import {
 } from "react-hook-form-mui";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import {useNavigate} from "react-router-dom";
 import Iconify from "../components/iconify";
 import {axiosClient} from "../utils/axiosClient";
 
-const columns = [
-    {field: 'id', headerName: 'ID', flex: 1},
-    {field: 'name', headerName: 'Tên', flex: 1},
-    {field: 'amount', headerName: 'Số lượng', flex: 1, editable: true},
-    {field: 'currency', headerName: 'Đơn vị', flex: 1},
-    {field: 'vat', headerName: 'Thuế', flex: 1},
-    {field: 'price', headerName: 'Đơn giá', flex: 1},
-    {field: 'total', headerName: 'Thành tiền', flex: 1},
-    {
-        field: "Action",
-        renderCell: () => (<div>
-            <IconButton><EditIcon/></IconButton>
-            <IconButton><DeleteIcon/></IconButton>
-        </div>),
-        flex: 1
-    }
-];
+
 const InputNewItem = ({onAddNewItem}) => {
     const getDetail = async (data) => {
         setProductId(data)
@@ -82,6 +67,7 @@ const InputNewItem = ({onAddNewItem}) => {
                             sx={{width: 300}}
                             renderInput={(params) => <TextField {...params} label="Tìm sản phẩm"/>}
                             id={"productId"}
+                            style={{width: "100%", marginBottom: 4}}
                         />
                         <SelectElement
                             label="Loại"
@@ -102,14 +88,37 @@ const InputInvoicePage = () => {
     const [openAdd, setOpenAdd] = useState(false)
     const [listSupplier, setListSupplier] = useState([])
     const [isBank, setIsBank] = useState(false)
+    const navigate = useNavigate();
+    const columns = [
+        {field: 'id', headerName: 'ID', flex: 1},
+        {field: 'name', headerName: 'Tên', flex: 1},
+        {field: 'amount', headerName: 'Số lượng', flex: 1, editable: true},
+        {field: 'currency', headerName: 'Đơn vị', flex: 1},
+        {field: 'vat', headerName: 'Thuế', flex: 1},
+        {field: 'price', headerName: 'Đơn giá', flex: 1, editable: true},
+        {field: 'total', headerName: 'Thành tiền', flex: 1},
+        {
+            field: "Action",
+            type: 'actions',
+            flex: 1,
+            cellClassName: 'actions',
+            getActions: ({ id }) => [
+                    <GridActionsCellItem icon={<DeleteIcon/>} label="Xoá" onClick={handleDeleteClick(id)} />
+            ],
+        }
+    ];
     const onSubmit = (values) => {
         const userData = {
             ...values,
-            "payment_method": "test",
-            total: rowData.length,
-            details: rowData.map(() => ({specification_id: 1, amount: 3}))
+            payment_method: values.payment_method === 1 ? 'Chuyển khoản' : 'Tiền mặt',
+            total: rowData.reduce((acc, v) => v.total + acc, 0),
+            details: rowData.map((v) => ({specification_id: v.id, amount: v.amount, price: v.price}))
         }
-        axiosClient.post("/api/input-invoices", userData).then(res => console.log(res))
+        console.log(userData)
+        axiosClient.post("/api/input-invoices", userData).then(res => {
+            console.log(res )
+            navigate('/input-invoices-list')
+        })
     }
     const onAddNewItem = (value) => {
         const newTotal = value.price * value.amount + value.price * value.vat / 100
@@ -117,11 +126,16 @@ const InputInvoicePage = () => {
         setOpenAdd(!openAdd)
     }
 
+    const handleDeleteClick = (id) => () => {
+        setRowData(rowData.filter((row) => row.id !== id));
+    };
+
     useEffect(() => {
         axiosClient.get("/api/suppliers").then(res => {
             setListSupplier(res.data.data.map((v) => ({id: v.id, label: v.name})))
         })
     }, [])
+
 
     return <>
         <Helmet>
@@ -171,8 +185,6 @@ const InputInvoicePage = () => {
                         fullWidth
                         options={listSupplier}
                     />
-                    <TextFieldElement name="customer_phone" label="Số ĐT" required fullWidth
-                                      style={{marginTop: "14px"}}/><br/>
                     <TextFieldElement name="deliver_name" label="Người giao" required fullWidth
                                       style={{marginTop: "14px"}}/><br/>
                     <TextFieldElement name="deliver_phone" label="Số ĐT người giao" required fullWidth
@@ -194,13 +206,19 @@ const InputInvoicePage = () => {
                             onChange={(v) => setIsBank(v === "2")}
                         />
                     </Stack>
-                    {isBank && <><TextFieldElement name="supplier_bank_account_number" label="STK Ncc" required={isBank}
-                                                   fullWidth
-                                                   style={{marginTop: "14px"}}/> <br/></>
+                    {isBank && <>
+                        <TextFieldElement name="supplier_bank" label="Ngân hàng" required={isBank}
+                                          fullWidth
+                                          style={{marginTop: "14px"}}/> <br/>
+                        <TextFieldElement name="supplier_bank_account_number" label="STK NCC" required={isBank}
+                                          fullWidth
+                                          style={{marginTop: "14px"}}/> <br/>
+
+                    </>
                     }
-                    <div>Tổng tiền: {rowData.reduce((acc, v) => v.total + acc, 0)}</div>
+                    <h3>Tổng tiền: {rowData.reduce((acc, v) => v.total + acc, 0)} VND</h3>
                     <Button type={'submit'} variant={'contained'} color={'primary'} style={{marginTop: "14px"}}>Lưu
-                        và in</Button>
+                        </Button>
                     <Button variant={'contained'} color={'error'} style={{margin: "14px 0 0 14px"}}>Huỷ bỏ</Button>
                 </FormContainer>
             </Grid>
