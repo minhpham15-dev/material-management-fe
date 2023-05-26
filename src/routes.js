@@ -17,18 +17,22 @@ import CreateSupplierPage from './pages/CreateSupplierPage';
 import CreateProductPage from './pages/CreateProductPage';
 import CreateEmployeePage from './pages/CreateEmployeePage';
 import InputInvoicePage from "./pages/InputInvoicePage";
+import {Role} from "./utils/role";
 
 // ----------------------------------------------------------------------
 
 export default function Router() {
+  const role = localStorage.getItem("role")
+  const token = localStorage.getItem("token")
   const routes = useRoutes([
     {
       path: '/dashboard',
-      element: <DashboardLayout />,
+      element: token ? <DashboardLayout /> :<Navigate to="/login"/>,
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
-        { path: 'user', element: <EmployeePage /> },
+          ... role === Role.ADMIN ? [{ path: 'user', element: <EmployeePage /> }]  : [],
+        // { path: 'user', element: <EmployeePage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
         {
@@ -65,15 +69,15 @@ export default function Router() {
     },
     {
       path: 'create-supplier',
-      element: <CreateSupplierPage />,
+      element:token ? <CreateSupplierPage /> :<Navigate to="/login"/>,
     },
     {
       path: 'create-product',
-      element: <CreateProductPage />,
+      element: token ? <CreateProductPage /> :<Navigate to="/login"/>,
     },
     {
       path: 'create-employee',
-      element: <CreateEmployeePage />,
+      element: (token && role) === Role.ADMIN ? <CreateEmployeePage /> :<Navigate to="/login"/>,
     },
   ]);
 
