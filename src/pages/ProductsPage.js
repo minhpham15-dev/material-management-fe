@@ -29,6 +29,7 @@ import Scrollbar from '../components/scrollbar';
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 import PRODUCTLIST from '../_mock/products';
+import { ButtonAdd } from '../components/button/create-button/ButtonAdd';
 
 // ----------------------------------------------------------------------
 
@@ -163,9 +164,7 @@ export default function ProductsPage() {
           <Typography variant="h4" gutterBottom>
             Quản lý nguyên vật liệu
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleCreateClick}>
-            Thêm mới
-          </Button>
+          <ButtonAdd navigateTo="/create-product" />
         </Stack>
 
         <Card>

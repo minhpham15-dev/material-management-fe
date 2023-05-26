@@ -27,6 +27,7 @@ import Scrollbar from '../components/scrollbar';
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 import INPUTINVOICELIST from '../_mock/inputInvoice';
+import { ButtonAdd } from '../components/button/create-button/ButtonAdd';
 
 // ----------------------------------------------------------------------
 
@@ -155,9 +156,7 @@ export default function InputInvoiceListPage() {
           <Typography variant="h4" gutterBottom>
             Danh sách hóa đơn nhập
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            Tạo hóa đơn nhập
-          </Button>
+          <ButtonAdd navigateTo="/">Tạo hóa đơn nhập</ButtonAdd>
         </Stack>
 
         <Card>

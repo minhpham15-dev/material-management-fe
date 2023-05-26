@@ -27,6 +27,7 @@ import Scrollbar from '../components/scrollbar';
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 import INVOICELIST from '../_mock/inovice';
+import { ButtonAdd } from '../components/button/create-button/ButtonAdd';
 
 // ----------------------------------------------------------------------
 
@@ -154,9 +155,7 @@ export default function InvoiceListPage() {
           <Typography variant="h4" gutterBottom>
             Danh sách hóa đơn bán
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            Tạo hóa đơn bán
-          </Button>
+          <ButtonAdd navigateTo="/invoice">Tạo hóa đơn bán</ButtonAdd>
         </Stack>
 
         <Card>

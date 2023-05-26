@@ -28,6 +28,7 @@ import Scrollbar from '../components/scrollbar';
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 import USERLIST from '../_mock/user';
+import { ButtonAdd } from '../components/button/create-button/ButtonAdd';
 
 // ----------------------------------------------------------------------
 
@@ -144,8 +145,6 @@ export default function EmployeePage() {
 
   const isNotFound = !filteredUsers.length && !!filterName;
 
-
-
   return (
     <>
       <Helmet>
@@ -157,9 +156,7 @@ export default function EmployeePage() {
           <Typography variant="h4" gutterBottom>
             Nhân viên
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            Thêm nhân viên mới
-          </Button>
+          <ButtonAdd navigateTo={'/create-employee'} />
         </Stack>
 
         <Card>

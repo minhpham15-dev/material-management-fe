@@ -3,6 +3,8 @@ import { Button, Card, Container, Stack, Typography } from '@mui/material';
 import { FormContainer, SelectElement, TextFieldElement } from 'react-hook-form-mui';
 import { useNavigate } from 'react-router-dom';
 
+import SUPPLIERLIST from '../_mock/suppliers';
+
 export default function CreateProductPage() {
   const navigate = useNavigate();
 
@@ -16,6 +18,9 @@ export default function CreateProductPage() {
     { id: 2, label: 'Nhôm' },
     { id: 3, label: 'Thép' },
   ];
+
+  const filterOptions = SUPPLIERLIST.map((sup) => ({ id: sup.id, label: sup.name }));
+  console.log(filterOptions);
   const handleBackClick = () => {
     navigate(-1);
   };
@@ -49,13 +54,8 @@ export default function CreateProductPage() {
                 <TextFieldElement name="tax" label="Thuế(%)" required />
               </Stack>
 
-              <Stack
-                direction="column"
-                alignItems="normal"
-                justifyContent="space-around"
-                spacing={{ xs: 1, sm: 2, md: 4 }}
-              >
-                <TextFieldElement name="taxCode" label="Mã số thuế" required />
+              <Stack direction="column" width={221}>
+                <SelectElement name="supplier" label="Nhà cung cấp" required options={filterOptions} />
               </Stack>
             </Stack>
             <Stack direction="row" alignItems="center" justifyContent="space-around" mb={2} mt={5}>
