@@ -39,7 +39,6 @@ export default function CreateProductPage() {
             onSuccess={(data) => {
               console.log(data);
             }}
-            defaultValues={{ category: '' }}
           >
             <Stack direction="row" alignItems="flex-start" justifyContent="space-around" mt={5}>
               <Stack
