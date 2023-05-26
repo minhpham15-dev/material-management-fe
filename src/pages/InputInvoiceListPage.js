@@ -156,7 +156,7 @@ export default function InputInvoiceListPage() {
           <Typography variant="h4" gutterBottom>
             Danh sách hóa đơn nhập
           </Typography>
-          <ButtonAdd navigateTo="/">Tạo hóa đơn nhập</ButtonAdd>
+          <ButtonAdd navigateTo="/input-invoice">Tạo hóa đơn nhập</ButtonAdd>
         </Stack>
 
         <Card>
