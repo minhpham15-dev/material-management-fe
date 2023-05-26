@@ -1,9 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {Helmet} from "react-helmet-async";
-import {Box, Button, IconButton, Modal, Stack, Typography} from "@mui/material";
+import {Autocomplete, Box, Button, IconButton, Modal, Stack, TextField, Typography} from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import {DataGrid} from "@mui/x-data-grid";
-import {FormContainer, RadioButtonGroup, SelectElement, TextFieldElement} from "react-hook-form-mui";
+import {
+    AutocompleteElement,
+    FormContainer,
+    RadioButtonGroup,
+    SelectElement,
+    TextFieldElement
+} from "react-hook-form-mui";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Iconify from "../components/iconify";
@@ -28,18 +34,21 @@ const columns = [
 ];
 const InputNewItem = ({onAddNewItem}) => {
     const getDetail = async (data) => {
+        setProductId(data)
         const res = await axiosClient.get(`/api/products/${data}/specifications`)
         setSpecs(res.data.data.map((v) => ({...v, id: v.product_types[0].id, label: v.product_types[0].name})))
     }
     const [specs, setSpecs] = useState([])
     const [products, setProducts] = useState([])
-    const getProducts = async () => axiosClient.get("/api/products")
+    const [search, setSearch] = useState("")
+    const [productId, setProductId] = useState("")
+    const getProducts = async (name) => axiosClient.get(`/api/products?name=${name}`)
     useEffect(() => {
-        getProducts().then(res => setProducts(res.data.data.map((v) => ({...v, label: v.name}))))
-    }, [])
+        getProducts(search).then(res => setProducts(res.data.data.map((v) => ({...v, label: v.name}))))
+    }, [search])
     const onSubmit = (data) => {
         const newSpecs = specs.filter(v => v.id === data.type)[0]
-        const newProduct = products.find(v => v.id === data.productId)
+        const newProduct = products.find(v => v.id === productId)
         onAddNewItem({
             id: newSpecs.id,
             name: newSpecs.product.name,
@@ -65,13 +74,22 @@ const InputNewItem = ({onAddNewItem}) => {
                     <FormContainer
                         onSuccess={data => onSubmit(data)}
                     >
-                        <SelectElement
-                            label="Sản phẩm"
-                            name="productId"
-                            fullWidth
-                            required
+                        {/* <AutocompleteElement */}
+                        {/*    label="Sản phẩm" */}
+                        {/*    name="productId" */}
+                        {/*    fullWidth */}
+                        {/*    required */}
+                        {/*    // options={products} */}
+                        {/*    onChange={(v) => console.log(v)} */}
+                        {/* options={products}/> */}
+                        <Autocomplete
+                            disablePortal
+                            onInputChange={(v) => setSearch(v.target.value)}
+                            onChange={(e, v) => getDetail(v.id)}
                             options={products}
-                            onChange={(v) => getDetail(v)}
+                            sx={{width: 300}}
+                            renderInput={(params) => <TextField {...params} label="Tìm sản phẩm"/>}
+                            id={"productId"}
                         />
                         <SelectElement
                             label="Loại"
@@ -189,7 +207,7 @@ const InputInvoicePage = () => {
                                                    fullWidth
                                                    style={{marginTop: "14px"}}/> <br/></>
                     }
-                    <div>Tổng tiền: {rowData.reduce((acc, v) => v.total + acc,  0)}</div>
+                    <div>Tổng tiền: {rowData.reduce((acc, v) => v.total + acc, 0)}</div>
                     <Button type={'submit'} variant={'contained'} color={'primary'} style={{marginTop: "14px"}}>Lưu
                         và in</Button>
                     <Button variant={'contained'} color={'error'} style={{margin: "14px 0 0 14px"}}>Huỷ bỏ</Button>

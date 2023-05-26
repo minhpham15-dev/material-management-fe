@@ -1,9 +1,11 @@
 // component
 import SvgColor from '../../../components/svg-color';
+import {Role} from "../../../utils/role";
 
 // ----------------------------------------------------------------------
 
 const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />;
+const role = localStorage.getItem("role")
 
 const navConfig = [
   // {
@@ -11,39 +13,39 @@ const navConfig = [
   //   path: '/dashboard/app',
   //   icon: icon('ic_analytics'),
   // },
-  {
+    ... role === Role.ADMIN ? [{
     title: 'Quản lý nhân viên',
-    path: '/dashboard/user',
+    path: '/user',
     icon: icon('ic_user'),
-  },
+  }] : [],
   {
     title: 'Quản lý nguyên vật liệu',
-    path: '/dashboard/products',
+    path: '/products',
     icon: icon('ic_cart'),
   },
   {
     title: 'Quản lý nhà cung cấp',
-    path: '/dashboard/suppliers',
+    path: '/suppliers',
     icon: icon('ic_cart'),
   },
   {
     title: 'Danh sách hóa đơn bán',
-    path: '/dashboard/invoices-list',
+    path: '/invoices-list',
     icon: icon('ic_cart'),
   },
   {
     title: 'Danh sách hóa đơn nhập',
-    path: '/dashboard/input-invoices-list',
+    path: '/input-invoices-list',
     icon: icon('ic_cart'),
   },
   {
     title: 'Tạo hóa đơn bán',
-    path: '/dashboard/invoice',
+    path: '/invoice',
     icon: icon('ic_cart'),
   },
   {
     title: 'Tạo hóa đơn nhập',
-    path: '/dashboard/input-invoice',
+    path: '/input-invoice',
     icon: icon('ic_cart'),
   },
   // {
