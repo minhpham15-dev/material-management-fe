@@ -74,14 +74,6 @@ const InputNewItem = ({onAddNewItem}) => {
                     <FormContainer
                         onSuccess={data => onSubmit(data)}
                     >
-                        {/* <AutocompleteElement */}
-                        {/*    label="Sản phẩm" */}
-                        {/*    name="productId" */}
-                        {/*    fullWidth */}
-                        {/*    required */}
-                        {/*    // options={products} */}
-                        {/*    onChange={(v) => console.log(v)} */}
-                        {/* options={products}/> */}
                         <Autocomplete
                             disablePortal
                             onInputChange={(v) => setSearch(v.target.value)}
@@ -158,7 +150,6 @@ const InputInvoicePage = () => {
                                     paginationModel: {page: 0, pageSize: 5},
                                 },
                             }}
-                            // onRowEditStop={(v) => console.log(v)}
                             pageSizeOptions={[5, 10]}
                             processRowUpdate={newRow => {
                                 const newTotal = newRow.price * newRow.amount + newRow.price * newRow.vat / 100;
