@@ -16,9 +16,10 @@ const gender = [
 ];
 
 export default function CreateEmployeePage() {
+    const navi = useNavigate()
+    const [upload, setUpload] = useState(null)
 
     const onSubmit = (values) => {
-        const navi = useNavigate()
         const date_of_birth = dayjs(values["date_of_birth"]).format("YYYY-MM-DD");
         delete values.avatar;
         delete values["date_of_birth"];
@@ -30,7 +31,6 @@ export default function CreateEmployeePage() {
         })
         axiosClient.post('/api/users', formData).then(res => navi("/user", {replace: true}))
     }
-    const [upload, setUpload] = useState(null)
     return (
         <>
             <Helmet>Thêm mới nhân viên</Helmet>

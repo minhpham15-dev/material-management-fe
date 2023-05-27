@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 // @mui
 import {
   Avatar,
@@ -9,7 +9,7 @@ import {
   Checkbox,
   Container,
   IconButton,
-  MenuItem,
+  MenuItem, Modal,
   Paper,
   Popover,
   Stack,
@@ -29,13 +29,18 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 import USERLIST from '../_mock/user';
 import { ButtonAdd } from '../components/button/create-button/ButtonAdd';
+import async from "async";
+import {axiosClient} from "../utils/axiosClient";
+import {DetailSupplier} from "./DetailSupplier";
+import {DetailEmployee} from "./DetailEmployee";
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Tên', alignRight: false },
-  { id: 'dateOfBirth', label: 'Ngày sinh', alignRight: false },
-  { id: 'phoneNumber', label: 'Số điện thoại', alignRight: false },
+  { id: 'date_of_birth', label: 'Ngày sinh', alignRight: false },
+  { id: 'phone', label: 'Số điện thoại', alignRight: false },
+  { id: 'email', label: 'Email', alignRight: false },
   { id: 'address', label: 'Địa chỉ', alignRight: false },
   { id: 'role', label: 'Chức vụ', alignRight: false },
   { id: '' },
@@ -59,18 +64,18 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-function applySortFilter(array, comparator, query) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
-  }
-  return stabilizedThis.map((el) => el[0]);
-}
+// function applySortFilter(array, comparator, query) {
+//   const stabilizedThis = array.map((el, index) => [el, index]);
+//   stabilizedThis.sort((a, b) => {
+//     const order = comparator(a[0], b[0]);
+//     if (order !== 0) return order;
+//     return a[1] - b[1];
+//   });
+//   if (query) {
+//     return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+//   }
+//   return stabilizedThis.map((el) => el[0]);
+// }
 
 export default function EmployeePage() {
   const [open, setOpen] = useState(null);
@@ -87,7 +92,19 @@ export default function EmployeePage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const handleOpenMenu = (event) => {
+  const [openModal, setOpenModal] = useState(false);
+
+  const [currentId, setCurrentId] = useState(null);
+
+  const [employees, setEmployees] = useState([])
+
+  const getEmployees =  async () => await axiosClient.get('/api/users');
+
+  useEffect(()  => {
+    getEmployees().then(res => setEmployees(res.data.data))
+  }, [openModal])
+  const handleOpenMenu = (event, id) => {
+    setCurrentId(id)
     setOpen(event.currentTarget);
   };
 
@@ -101,14 +118,14 @@ export default function EmployeePage() {
     setOrderBy(property);
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
+  // const handleSelectAllClick = (event) => {
+  //   if (event.target.checked) {
+  //     const newSelecteds = USERLIST.map((n) => n.name);
+  //     setSelected(newSelecteds);
+  //     return;
+  //   }
+  //   setSelected([]);
+  // };
 
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);
@@ -139,11 +156,11 @@ export default function EmployeePage() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - employees.length) : 0;
 
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
+  // const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
 
-  const isNotFound = !filteredUsers.length && !!filterName;
+  // const isNotFound = !filteredUsers.length && !!filterName;
 
   return (
     <>
@@ -169,14 +186,14 @@ export default function EmployeePage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={employees.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
-                  onSelectAllClick={handleSelectAllClick}
+                  // onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, avatarUrl, dateOfBirth, phoneNumber, address, role } = row;
+                  {employees && employees.map((row) => {
+                    const { id, name, avatar, date_of_birth, phone, address, role, email } = row;
                     const selectedUser = selected.indexOf(name) !== -1;
                     return (
                       <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
@@ -186,16 +203,18 @@ export default function EmployeePage() {
 
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar alt={name} src={avatarUrl} />
+                            <Avatar alt={name} src={avatar} />
                             <Typography variant="subtitle2" noWrap>
                               {name}
                             </Typography>
                           </Stack>
                         </TableCell>
 
-                        <TableCell align="left">{dateOfBirth}</TableCell>
+                        <TableCell align="left">{date_of_birth}</TableCell>
 
-                        <TableCell align="left">{phoneNumber}</TableCell>
+                        <TableCell align="left">{phone}</TableCell>
+
+                        <TableCell align="left">{email}</TableCell>
 
                         <TableCell align="left">{address}</TableCell>
 
@@ -206,7 +225,7 @@ export default function EmployeePage() {
                         {/* </TableCell> */}
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                          <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, id)}>
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
@@ -220,28 +239,28 @@ export default function EmployeePage() {
                   )}
                 </TableBody>
 
-                {isNotFound && (
-                  <TableBody>
-                    <TableRow>
-                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                        <Paper
-                          sx={{
-                            textAlign: 'center',
-                          }}
-                        >
-                          <Typography variant="h6" paragraph>
-                            Not found
-                          </Typography>
+                {!employees.length && (
+                    <TableBody>
+                      <TableRow>
+                        <TableCell align="center" colSpan={6} sx={{py: 3}}>
+                          <Paper
+                              sx={{
+                                textAlign: 'center',
+                              }}
+                          >
+                            <Typography variant="h6" paragraph>
+                              Không tìm thấy dữ liệu
+                            </Typography>
 
-                          <Typography variant="body2">
-                            No results found for &nbsp;
-                            <strong>&quot;{filterName}&quot;</strong>.
-                            <br /> Try checking for typos or using complete words.
-                          </Typography>
-                        </Paper>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
+                            <Typography variant="body2">
+                              Không tìm thấy kết quả cho &nbsp;
+                              <strong>&quot;{filterName}&quot;</strong>.
+                              <br/> Vui lòng kiểm tra lại các ký tự hoặc từ muốn tìm kiếm.
+                            </Typography>
+                          </Paper>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
                 )}
               </Table>
             </TableContainer>
@@ -250,7 +269,7 @@ export default function EmployeePage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={USERLIST.length}
+            count={employees.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -277,9 +296,9 @@ export default function EmployeePage() {
           },
         }}
       >
-        <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Sửa
+        <MenuItem onClick={() => setOpenModal(true)}>
+          <Iconify icon={'eva:eye-fill'} sx={{ mr: 2 }} />
+          Xem
         </MenuItem>
 
         <MenuItem sx={{ color: 'error.main' }}>
@@ -287,6 +306,8 @@ export default function EmployeePage() {
           Xóa
         </MenuItem>
       </Popover>
+      <Modal open={openModal} children={<DetailEmployee data={currentId} setOpenModal={setOpenModal}/>}
+             onClose={() => setOpenModal(false)}/>
     </>
   );
 }
