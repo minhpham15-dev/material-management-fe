@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
 // mocks_
-import {useNavigate} from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 import account from '../../../_mock/account';
 
 // ----------------------------------------------------------------------
@@ -32,10 +32,14 @@ export default function AccountPopover() {
     setOpen(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleLogout = () => {
     localStorage.clear();
     navigate("/login", {replace: true})
   };
+
+  const handleClose = () => {
+    setOpen(!open)
+  }
 
   const handleProfile = () => {
     navigate("/profile")
@@ -65,6 +69,7 @@ export default function AccountPopover() {
 
       <Popover
         open={Boolean(open)}
+        onClose={handleClose}
         anchorEl={open}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -93,7 +98,7 @@ export default function AccountPopover() {
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Stack sx={{ p: 1 }}>
-          <MenuItem>
+          <MenuItem onClick={() => <Navigate to={'/home'} /> }>
             Home
           </MenuItem>
           <MenuItem onClick={handleProfile}>
@@ -103,7 +108,7 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <MenuItem onClick={handleClose} sx={{ m: 1 }}>
+        <MenuItem onClick={handleLogout} sx={{ m: 1 }}>
           Logout
         </MenuItem>
       </Popover>

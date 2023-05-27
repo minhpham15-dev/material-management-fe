@@ -2,12 +2,15 @@ import { Helmet } from 'react-helmet-async';
 import { Button, Card, Container, Stack, Typography } from '@mui/material';
 import { FormContainer, TextFieldElement } from 'react-hook-form-mui';
 import { useNavigate } from 'react-router-dom';
+import {ButtonBack} from "../components/button/back-button/ButtonBack";
+import {axiosClient} from "../utils/axiosClient";
 
 export default function CreateSupplierPage() {
   const navigate = useNavigate();
-  const handleBackClick = () => {
-    navigate(-1);
-  };
+
+  const onSubmit = (values) => {
+    axiosClient.post('/api/suppliers', values).then(res => navigate('/suppliers'));
+  }
   return (
     <>
       <Helmet>
@@ -23,7 +26,7 @@ export default function CreateSupplierPage() {
         <Card>
           <FormContainer
             onSuccess={(data) => {
-              console.log(data);
+              onSubmit(data);
             }}
           >
             <Stack direction="row" alignItems="flex-start" justifyContent="space-around" mt={5}>
@@ -35,8 +38,8 @@ export default function CreateSupplierPage() {
               >
                 <TextFieldElement name="name" label="Tên nhà cung cấp" required />
                 <TextFieldElement name="email" label="Email" required />
-                <TextFieldElement name="address" label="Địa chỉ" required />
-                <TextFieldElement name="phoneNumber" label="Số điện thoại" required />
+                {/*<TextFieldElement name="address" label="Địa chỉ" required />*/}
+                <TextFieldElement name="phone" label="Số điện thoại" required />
               </Stack>
 
               <Stack
@@ -45,18 +48,16 @@ export default function CreateSupplierPage() {
                 justifyContent="space-around"
                 spacing={{ xs: 1, sm: 2, md: 4 }}
               >
-                <TextFieldElement name="taxCode" label="Mã số thuế" required />
+                <TextFieldElement name="tax_code" label="Mã số thuế" required />
                 <TextFieldElement name="representative" label="Người đại diện" required />
-                <TextFieldElement name="representativePhoneNumber" label="Số điện thoại người đại diện" required />
+                <TextFieldElement name="representative_phone" label="Số điện thoại người đại diện" required />
               </Stack>
             </Stack>
-            <Stack direction="row" alignItems="center" justifyContent="space-around" mb={2} mt={5}>
+            <Stack direction="row" alignItems="center" justifyContent="center" mb={2} mt={5} spacing={5}>
               <Button variant="contained" size="large" type="submit">
                 OK
               </Button>
-              <Button variant="contained" size="large" style={{ marginLeft: 10 }} onClick={handleBackClick}>
-                Quay lại
-              </Button>
+              <ButtonBack />
             </Stack>
           </FormContainer>
         </Card>

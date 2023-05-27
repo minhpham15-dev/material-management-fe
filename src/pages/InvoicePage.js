@@ -186,7 +186,9 @@ export default function InvoicePage() {
                         <TextFieldElement name="customer_name" label="Tên khách hàng" required fullWidth/> <br/>
                         <TextFieldElement name="customer_phone" label="Số ĐT" required fullWidth
                                           style={{marginTop: "14px"}}/><br/>
-                        <TextFieldElement name="customer_email" label="Email" required fullWidth
+                        {/*<TextFieldElement name="customer_email" label="Email" required fullWidth*/}
+                        {/*                  style={{marginTop: "14px"}}/><br/>*/}
+                        <TextFieldElement name="customer_address" label="Địa chỉ" required fullWidth
                                           style={{marginTop: "14px"}}/><br/>
                         <Stack>
                             <RadioButtonGroup

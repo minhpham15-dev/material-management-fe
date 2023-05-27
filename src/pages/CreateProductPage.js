@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import SUPPLIERLIST from '../_mock/suppliers';
 import { axiosClient } from '../utils/axiosClient';
+import {ButtonBack} from "../components/button/back-button/ButtonBack";
 
 export default function CreateProductPage() {
   const navigate = useNavigate();
@@ -71,13 +72,11 @@ export default function CreateProductPage() {
                 <SelectElement name="supplier" label="Nhà cung cấp" required options={filterOptions} />
               </Stack>
             </Stack>
-            <Stack direction="row" alignItems="center" justifyContent="space-around" mb={2} mt={5}>
+            <Stack direction="row" alignItems="center" justifyContent="center" mb={2} mt={5} spacing={5}>
               <Button variant="contained" size="large" type="submit">
                 OK
               </Button>
-              <Button variant="contained" size="large" style={{ marginLeft: 10 }} onClick={handleBackClick}>
-                Quay lại
-              </Button>
+              <ButtonBack />
             </Stack>
           </FormContainer>
         </Card>

@@ -29,6 +29,8 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 import INPUTINVOICELIST from '../_mock/inputInvoice';
 import { ButtonAdd } from '../components/button/create-button/ButtonAdd';
 import { axiosClient } from '../utils/axiosClient';
+import async from "async";
+import {id} from "date-fns/locale";
 
 // ----------------------------------------------------------------------
 
@@ -87,6 +89,8 @@ export default function InputInvoiceListPage() {
   const [filterName, setFilterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [idSupplier, setIdSupplier] = useState(0);
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -149,6 +153,11 @@ export default function InputInvoiceListPage() {
   useEffect(() => {
     axiosClient.get('/api/input-invoices').then((res) => setData(res.data.data));
   }, []);
+  console.log(data)
+  // const getSupplier = async (id) => axiosClient.get(`/api/products/${id}`);
+  // useEffect(() => {
+  //   getSupplier()
+  // }, [data])
   return (
     <>
       <Helmet>
@@ -182,11 +191,11 @@ export default function InputInvoiceListPage() {
                   {data.map((row) => {
                     console.log(row);
                     const { id, created_at, supplier_id, payment_method, total, deliver_name } = row;
-                    const selectedUser = selected.indexOf(idInvoice) !== -1;
+                    const selectedUser = selected.indexOf(id) !== -1;
                     return (
                       <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
                         <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, idInvoice)} />
+                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, id)} />
                         </TableCell>
 
                         <TableCell align="left">{id}</TableCell>
