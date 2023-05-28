@@ -114,9 +114,7 @@ const InputInvoicePage = () => {
             total: rowData.reduce((acc, v) => v.total + acc, 0),
             details: rowData.map((v) => ({specification_id: v.id, amount: v.amount, price: v.price}))
         }
-        console.log(userData)
         axiosClient.post("/api/input-invoices", userData).then(res => {
-            console.log(res )
             navigate('/input-invoices-list')
         })
     }

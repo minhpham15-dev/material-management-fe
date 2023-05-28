@@ -23,7 +23,6 @@ export default function CreateProductPage() {
   ];
 
   const filterOptions = SUPPLIERLIST.map((sup) => ({ id: sup.id, label: sup.name }));
-  console.log(filterOptions);
   const handleBackClick = () => {
     navigate(-1);
   };
@@ -44,7 +43,6 @@ export default function CreateProductPage() {
         <Card>
           <FormContainer
             onSuccess={(data) => {
-              console.log(data);
               axiosClient.post('/api/products', {
                 category_id: data.category,
                 name: data.name,

@@ -33,7 +33,6 @@ export default function ProfilePage() {
         formContext.setValue("role", profile?.role || "")
         formContext.setValue("email", profile?.email || "")
     }, [profile])
-    console.log(profile)
     return (<>
         <Helmet>
             <title>Thông tin cá nhân</title>

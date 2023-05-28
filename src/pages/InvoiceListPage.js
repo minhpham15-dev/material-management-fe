@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 // @mui
 import {
   Button,
@@ -8,7 +8,7 @@ import {
   Checkbox,
   Container,
   IconButton,
-  MenuItem,
+  MenuItem, Modal,
   Paper,
   Popover,
   Stack,
@@ -28,6 +28,9 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 import INVOICELIST from '../_mock/inovice';
 import { ButtonAdd } from '../components/button/create-button/ButtonAdd';
+import {DetailSupplier} from "./DetailSupplier";
+import {axiosClient} from "../utils/axiosClient";
+import DetailInvoice from "./DetailInvoice";
 
 // ----------------------------------------------------------------------
 
@@ -86,8 +89,9 @@ export default function InvoiceListPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const handleOpenMenu = (event) => {
+  const handleOpenMenu = (event, id) => {
     setOpen(event.currentTarget);
+    setCurrentId(id)
   };
 
   const handleCloseMenu = () => {
@@ -143,7 +147,12 @@ export default function InvoiceListPage() {
   const filteredUsers = applySortFilter(INVOICELIST, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
-
+  const [openModal, setOpenModal] = useState(false);
+  const [currentId, setCurrentId] = useState(null);
+  const [invoices, setInvoice] = useState([])
+  useEffect(() => {
+    axiosClient.get("/api/invoices").then(res => setInvoice(res.data.data))
+  },[])
   return (
     <>
       <Helmet>
@@ -174,22 +183,22 @@ export default function InvoiceListPage() {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, idInvoice, createdAt, customerName, customerPhone, total } = row;
-                    const selectedUser = selected.indexOf(idInvoice) !== -1;
+                  {invoices.map((row) => {
+                    const { id, created_at, customer_name, customer_phone, total } = row;
+                    const selectedUser = selected.indexOf(id) !== -1;
                     return (
                       <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
                         <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, idInvoice)} />
+                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, id)} />
                         </TableCell>
 
-                        <TableCell align="left">{idInvoice}</TableCell>
+                        <TableCell align="left">{id}</TableCell>
 
-                        <TableCell align="left">{createdAt}</TableCell>
+                        <TableCell align="left">{created_at}</TableCell>
 
-                        <TableCell align="left">{customerName}</TableCell>
+                        <TableCell align="left">{customer_name}</TableCell>
 
-                        <TableCell align="left">{customerPhone}</TableCell>
+                        <TableCell align="left">{customer_phone}</TableCell>
 
                         <TableCell align="center">{total}</TableCell>
 
@@ -198,7 +207,7 @@ export default function InvoiceListPage() {
                         {/* </TableCell> */}
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                          <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, id)}>
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
@@ -269,11 +278,13 @@ export default function InvoiceListPage() {
           },
         }}
       >
-        <MenuItem>
+        <MenuItem onClick={() => setOpenModal(true)}>
           <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
           Xem
         </MenuItem>
       </Popover>
+      <Modal open={openModal} children={<DetailInvoice data={currentId} setOpenModal={setOpenModal}/>}
+             onClose={() => setOpenModal(false)}/>
     </>
   );
 }

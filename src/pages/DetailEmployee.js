@@ -36,7 +36,6 @@ export const DetailEmployee =  ({data, setOpenModal}) => {
         formContext.setValue("role", currentEmployee?.role || "")
         formContext.setValue("is_male", genderConfig[currentEmployee?.gender] || "")
     }, [currentEmployee])
-    console.log(currentEmployee)
     return <>
         <Container style={{transform: 'translate(0%, 50%)'}}>
             <Card>
