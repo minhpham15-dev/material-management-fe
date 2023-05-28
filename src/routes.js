@@ -15,26 +15,32 @@ import InvoicePage from './pages/InvoicePage';
 import CreateSupplierPage from './pages/CreateSupplierPage';
 import CreateProductPage from './pages/CreateProductPage';
 import CreateEmployeePage from './pages/CreateEmployeePage';
-import InputInvoicePage from "./pages/InputInvoicePage";
-import {Role} from "./utils/role";
-import ProfilePage from "./pages/ProfilePage";
+import InputInvoicePage from './pages/InputInvoicePage';
+import { Role } from './utils/role';
+import ProfilePage from './pages/ProfilePage';
 
 // ----------------------------------------------------------------------
 
 export default function Router() {
-  const role = localStorage.getItem("role")
-  const token = localStorage.getItem("token")
+  const role = localStorage.getItem('role');
+  console.log(role === Role.ADMIN);
+  const token = localStorage.getItem('token');
   const routes = useRoutes([
     {
       path: '/',
-      element: token ? <DashboardLayout /> :<Navigate to="/login"/>,
+      element: token ? <DashboardLayout /> : <Navigate to="/login" />,
       children: [
         { element: <Navigate to="/home" />, index: true },
         { path: 'home', element: <DashboardAppPage /> },
-          ... role === Role.ADMIN ? [{ path: 'user', element: <EmployeePage /> }, {
-            path: 'create-employee',
-            element: <CreateEmployeePage />,
-          },]  : [],
+        ...(role === Role.ADMIN
+          ? [
+              { path: 'user', element: <EmployeePage /> },
+              {
+                path: 'create-employee',
+                element: <CreateEmployeePage />,
+              },
+            ]
+          : []),
         { path: 'products', element: <ProductsPage /> },
         {
           path: 'suppliers',
@@ -46,16 +52,16 @@ export default function Router() {
         { path: 'invoice', element: <InvoicePage /> },
         {
           path: 'create-supplier',
-          element:token ? <CreateSupplierPage /> :<Navigate to="/login"/>,
+          element: token ? <CreateSupplierPage /> : <Navigate to="/login" />,
         },
         {
           path: 'create-product',
-          element: token ? <CreateProductPage /> :<Navigate to="/login"/>,
+          element: token ? <CreateProductPage /> : <Navigate to="/login" />,
         },
         {
           path: 'profile',
-          element: <ProfilePage />
-        }
+          element: <ProfilePage />,
+        },
       ],
     },
     {

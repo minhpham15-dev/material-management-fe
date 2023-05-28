@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { filter } from 'lodash';
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 // @mui
 import {
   Avatar,
@@ -8,8 +7,14 @@ import {
   Card,
   Checkbox,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
-  MenuItem, Modal,
+  MenuItem,
+  Modal,
   Paper,
   Popover,
   Stack,
@@ -27,12 +32,9 @@ import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
-import USERLIST from '../_mock/user';
 import { ButtonAdd } from '../components/button/create-button/ButtonAdd';
-import async from "async";
-import {axiosClient} from "../utils/axiosClient";
-import {DetailSupplier} from "./DetailSupplier";
-import {DetailEmployee} from "./DetailEmployee";
+import { axiosClient } from '../utils/axiosClient';
+import { DetailEmployee } from './DetailEmployee';
 
 // ----------------------------------------------------------------------
 
@@ -96,15 +98,18 @@ export default function EmployeePage() {
 
   const [currentId, setCurrentId] = useState(null);
 
-  const [employees, setEmployees] = useState([])
+  const [employees, setEmployees] = useState([]);
+  const [isDelete, setIsDelete] = useState(false);
+  const [isReloadTable, setIsReloadTable] = useState(false);
 
-  const getEmployees =  async () => await axiosClient.get('/api/users');
+  const getEmployees = async () => await axiosClient.get('/api/users');
+  const deleteEmployee = async (id) => await axiosClient.delete(`/api/users/${id}`);
 
-  useEffect(()  => {
-    getEmployees().then(res => setEmployees(res.data.data))
-  }, [openModal])
+  useEffect(() => {
+    getEmployees().then((res) => setEmployees(res.data.data));
+  }, [openModal, isReloadTable]);
   const handleOpenMenu = (event, id) => {
-    setCurrentId(id)
+    setCurrentId(id);
     setOpen(event.currentTarget);
   };
 
@@ -158,6 +163,15 @@ export default function EmployeePage() {
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - employees.length) : 0;
 
+  const handleDeleteUser = (id) => {
+    console.log('delete');
+    deleteEmployee(id).then((res) => {
+      console.log(res);
+      setIsDelete(false);
+      setIsReloadTable(true);
+    });
+  };
+
   // const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
 
   // const isNotFound = !filteredUsers.length && !!filterName;
@@ -192,46 +206,47 @@ export default function EmployeePage() {
                   // onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {employees && employees.map((row) => {
-                    const { id, name, avatar, date_of_birth, phone, address, role, email } = row;
-                    const selectedUser = selected.indexOf(name) !== -1;
-                    return (
-                      <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
-                        <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
-                        </TableCell>
+                  {employees &&
+                    employees.map((row) => {
+                      const { id, name, avatar, date_of_birth, phone, address, role, email } = row;
+                      const selectedUser = selected.indexOf(name) !== -1;
+                      return (
+                        <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                          <TableCell padding="checkbox">
+                            <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
+                          </TableCell>
 
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar alt={name} src={avatar} />
-                            <Typography variant="subtitle2" noWrap>
-                              {name}
-                            </Typography>
-                          </Stack>
-                        </TableCell>
+                          <TableCell component="th" scope="row" padding="none">
+                            <Stack direction="row" alignItems="center" spacing={2}>
+                              <Avatar alt={name} src={avatar} />
+                              <Typography variant="subtitle2" noWrap>
+                                {name}
+                              </Typography>
+                            </Stack>
+                          </TableCell>
 
-                        <TableCell align="left">{date_of_birth}</TableCell>
+                          <TableCell align="left">{date_of_birth}</TableCell>
 
-                        <TableCell align="left">{phone}</TableCell>
+                          <TableCell align="left">{phone}</TableCell>
 
-                        <TableCell align="left">{email}</TableCell>
+                          <TableCell align="left">{email}</TableCell>
 
-                        <TableCell align="left">{address}</TableCell>
+                          <TableCell align="left">{address}</TableCell>
 
-                        <TableCell align="left">{role}</TableCell>
+                          <TableCell align="left">{role === 1 ? 'Quản lý' : 'Nhân viên'}</TableCell>
 
-                        {/* <TableCell align="left"> */}
-                        {/*  <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label> */}
-                        {/* </TableCell> */}
+                          {/* <TableCell align="left"> */}
+                          {/*  <Label color={(status === 'banned' && 'error') || 'success'}>{sentence Case(status)}</Label> */}
+                          {/* </TableCell> */}
 
-                        <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, id)}>
-                            <Iconify icon={'eva:more-vertical-fill'} />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                          <TableCell align="right">
+                            <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, id)}>
+                              <Iconify icon={'eva:more-vertical-fill'} />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   {emptyRows > 0 && (
                     <TableRow style={{ height: 53 * emptyRows }}>
                       <TableCell colSpan={6} />
@@ -240,27 +255,27 @@ export default function EmployeePage() {
                 </TableBody>
 
                 {!employees.length && (
-                    <TableBody>
-                      <TableRow>
-                        <TableCell align="center" colSpan={6} sx={{py: 3}}>
-                          <Paper
-                              sx={{
-                                textAlign: 'center',
-                              }}
-                          >
-                            <Typography variant="h6" paragraph>
-                              Không tìm thấy dữ liệu
-                            </Typography>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                        <Paper
+                          sx={{
+                            textAlign: 'center',
+                          }}
+                        >
+                          <Typography variant="h6" paragraph>
+                            Không tìm thấy dữ liệu
+                          </Typography>
 
-                            <Typography variant="body2">
-                              Không tìm thấy kết quả cho &nbsp;
-                              <strong>&quot;{filterName}&quot;</strong>.
-                              <br/> Vui lòng kiểm tra lại các ký tự hoặc từ muốn tìm kiếm.
-                            </Typography>
-                          </Paper>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
+                          <Typography variant="body2">
+                            Không tìm thấy kết quả cho &nbsp;
+                            <strong>&quot;{filterName}&quot;</strong>.
+                            <br /> Vui lòng kiểm tra lại các ký tự hoặc từ muốn tìm kiếm.
+                          </Typography>
+                        </Paper>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
                 )}
               </Table>
             </TableContainer>
@@ -301,13 +316,40 @@ export default function EmployeePage() {
           Xem
         </MenuItem>
 
-        <MenuItem sx={{ color: 'error.main' }}>
+        <MenuItem sx={{ color: 'error.main' }} onClick={() => setIsDelete(true)}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
           Xóa
         </MenuItem>
       </Popover>
-      <Modal open={openModal} children={<DetailEmployee data={currentId} setOpenModal={setOpenModal}/>}
-             onClose={() => setOpenModal(false)}/>
+
+      <Modal
+        open={openModal}
+        children={<DetailEmployee data={currentId} setOpenModal={setOpenModal} />}
+        onClose={() => setOpenModal(false)}
+      />
+
+      <Dialog
+        open={isDelete}
+        onClose={() => setIsDelete(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{'Xóa nhân viên?'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Let Google help apps determine location. This means sending anonymous location data to Google, even when no
+            apps are running.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" onClick={() => setIsDelete(false)}>
+            Quay lại
+          </Button>
+          <Button variant="contained" onClick={handleDeleteUser(currentId)} autoFocus>
+            Đồng ý
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
