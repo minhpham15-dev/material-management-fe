@@ -6,7 +6,6 @@ import {Helmet} from "react-helmet-async";
 import {Box, Button, Grid, Modal, Stack, Typography} from "@mui/material";
 import {DataGrid} from "@mui/x-data-grid";
 import {FormContainer, RadioButtonGroup, SelectElement, TextFieldElement} from "react-hook-form-mui";
-import Iconify from "../components/iconify";
 
 
 const columns = [
@@ -19,23 +18,24 @@ const columns = [
 ];
 const DetailInputInvoice = ({data, setOpenModal}) => {
     const [currentSupplier, setCurrentSupplier] = useState(null)
+    console.log("currentSupplier", currentSupplier)
     const [rowData, setRowData] = useState([])
     useEffect(() => {
         axiosClient.get(`/api/input-invoices/${data}`).then(res => setCurrentSupplier(res.data.data))
     }, [data])
     const formContext = useForm({
         defaultValues: {
-            customer_name: currentSupplier?.customer_name || "",
-            customer_phone: currentSupplier?.customer_phone || "",
-            customer_address: currentSupplier?.customer_address || "",
-            payment_method: getKeyByValue(PaymentMethod, currentSupplier?.payment_method) || "",
+            supplier_id: currentSupplier?.supplier.name || "",
+            deliver_name: currentSupplier?.deliver_name || "",
+            deliver_phone: currentSupplier?.deliver_phone || "",
+            payment_method: currentSupplier?.payment_method || "",
         }
     });
     useEffect(() => {
-        formContext.setValue("customer_name", currentSupplier?.customer_name || "")
-        formContext.setValue("customer_phone", currentSupplier?.customer_phone || "")
-        formContext.setValue("customer_address", currentSupplier?.customer_address || "")
-        formContext.setValue("payment_method", getKeyByValue(PaymentMethod, currentSupplier?.payment_method) || "")
+        formContext.setValue("supplier_id",  currentSupplier?.supplier.name || "")
+        formContext.setValue("deliver_name", currentSupplier?.deliver_name || "")
+        formContext.setValue("deliver_phone", currentSupplier?.deliver_phone || "")
+        formContext.setValue("payment_method", currentSupplier?.payment_method || "")
     }, [currentSupplier])
     useEffect(() => {
         if(currentSupplier?.details){
@@ -63,14 +63,14 @@ const DetailInputInvoice = ({data, setOpenModal}) => {
             borderRadius: "5px"
         }}>
             <Helmet>
-                <title> Tạo hoá đơn nhập | Material Management </title>
+                <title> Chi tiết hoá đơn nhập | Material Management </title>
             </Helmet>
             <Grid container spacing={2}>
                 <Grid xs={8}>
                     <>
                         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                             <Typography variant="h4" gutterBottom>
-                                Tạo hoá đơn nhập
+                                Chi tiết hoá đơn nhập
                             </Typography>
                         </Stack>
                         <Box sx={{height: 400}}>
@@ -82,35 +82,26 @@ const DetailInputInvoice = ({data, setOpenModal}) => {
                                         paginationModel: {page: 0, pageSize: 5},
                                     },
                                 }}
-                                pageSizeOptions={[5, 10]}
-                                processRowUpdate={newRow => {
-                                    const newTotal = newRow.price * newRow.amount + newRow.price * newRow.vat / 100;
-                                    const updatedRow = {...newRow, total: newTotal, isNew: false};
-                                    setRowData(rowData.map((row) => (row.id === newRow.id ? updatedRow : row)));
-                                    return updatedRow;
-                                }}
+                                hideFooter={true}
                             />
                         </Box>
                     </>
                 </Grid>
                 <Grid xs={4}>
                     <FormContainer
-                        onSuccess={data => onSubmit(data)}
+                        formContext={formContext}
                     >
-                        <SelectElement
-                            label="Nhà cung cấp"
-                            name="supplier_id"
-                            fullWidth
-                            options={listSupplier}
-                        />
+                        <TextFieldElement name="supplier_id" label="Nhà cung cấp" required fullWidth
+                                          style={{marginTop: "14px"}} disabled/><br/>
                         <TextFieldElement name="deliver_name" label="Người giao" required fullWidth
-                                          style={{marginTop: "14px"}}/><br/>
+                                          style={{marginTop: "14px"}}  disabled/><br/>
                         <TextFieldElement name="deliver_phone" label="Số ĐT người giao" required fullWidth
-                                          style={{marginTop: "14px", marginBottom: "14px"}}/> <br/>
+                                          style={{marginTop: "14px", marginBottom: "14px"}}disabled/> <br/>
                         <Stack>
                             <RadioButtonGroup
                                 label="Phương thức thanh toán"
                                 name="payment_method"
+                                disabled
                                 options={[
                                     {
                                         id: '1',
@@ -121,107 +112,9 @@ const DetailInputInvoice = ({data, setOpenModal}) => {
                                         label: 'CK Ngân hàng'
                                     }
                                 ]}
-                                onChange={(v) => setIsBank(v === "2")}
                             />
                         </Stack>
-                        {isBank && <>
-                            <TextFieldElement name="supplier_bank" label="Ngân hàng" required={isBank}
-                                              fullWidth
-                                              style={{marginTop: "14px"}}/> <br/>
-                            <TextFieldElement name="supplier_bank_account_number" label="STK NCC" required={isBank}
-                                              fullWidth
-                                              style={{marginTop: "14px"}}/> <br/>
-
-                        </>
-                        }
-                        <h3>Tổng tiền: {rowData.reduce((acc, v) => v.total + acc, 0)} VND</h3>
-                        <Button type={'submit'} variant={'contained'} color={'primary'} style={{marginTop: "14px"}}>Lưu
-                        </Button>
-                        <Button variant={'contained'} color={'error'} style={{margin: "14px 0 0 14px"}}>Huỷ bỏ</Button>
-                    </FormContainer>
-                </Grid>
-            </Grid><Helmet>
-            <title> Tạo hoá đơn nhập | Material Management </title>
-        </Helmet>
-            <Modal open={openAdd} children={<InputNewItem onAddNewItem={onAddNewItem}/>}
-                   onClose={() => setOpenAdd(!openAdd)}/>
-            <Grid container spacing={2}>
-                <Grid xs={8}>
-                    <>
-                        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-                            <Typography variant="h4" gutterBottom>
-                                Tạo hoá đơn nhập
-                            </Typography>
-                            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill"/>}
-                                    onClick={() => setOpenAdd(!openAdd)}>
-                                Thêm sản phẩm
-                            </Button>
-                        </Stack>
-                        <Box sx={{height: 400}}>
-                            <DataGrid
-                                rows={rowData}
-                                columns={columns}
-                                initialState={{
-                                    pagination: {
-                                        paginationModel: {page: 0, pageSize: 5},
-                                    },
-                                }}
-                                pageSizeOptions={[5, 10]}
-                                processRowUpdate={newRow => {
-                                    const newTotal = newRow.price * newRow.amount + newRow.price * newRow.vat / 100;
-                                    const updatedRow = {...newRow, total: newTotal, isNew: false};
-                                    setRowData(rowData.map((row) => (row.id === newRow.id ? updatedRow : row)));
-                                    return updatedRow;
-                                }}
-                            />
-                        </Box>
-                    </>
-                </Grid>
-                <Grid xs={4}>
-                    <FormContainer
-                        onSuccess={data => onSubmit(data)}
-                    >
-                        <SelectElement
-                            label="Nhà cung cấp"
-                            name="supplier_id"
-                            fullWidth
-                            options={listSupplier}
-                        />
-                        <TextFieldElement name="deliver_name" label="Người giao" required fullWidth
-                                          style={{marginTop: "14px"}}/><br/>
-                        <TextFieldElement name="deliver_phone" label="Số ĐT người giao" required fullWidth
-                                          style={{marginTop: "14px", marginBottom: "14px"}}/> <br/>
-                        <Stack>
-                            <RadioButtonGroup
-                                label="Phương thức thanh toán"
-                                name="payment_method"
-                                options={[
-                                    {
-                                        id: '1',
-                                        label: 'Tiền mặt'
-                                    },
-                                    {
-                                        id: '2',
-                                        label: 'CK Ngân hàng'
-                                    }
-                                ]}
-                                onChange={(v) => setIsBank(v === "2")}
-                            />
-                        </Stack>
-                        {isBank && <>
-                            <TextFieldElement name="supplier_bank" label="Ngân hàng" required={isBank}
-                                              fullWidth
-                                              style={{marginTop: "14px"}}/> <br/>
-                            <TextFieldElement name="supplier_bank_account_number" label="STK NCC" required={isBank}
-                                              fullWidth
-                                              style={{marginTop: "14px"}}/> <br/>
-
-                        </>
-                        }
-                        <h3>Tổng tiền: {rowData.reduce((acc, v) => v.total + acc, 0)} VND</h3>
-                        <Button type={'submit'} variant={'contained'} color={'primary'} style={{marginTop: "14px"}}>Lưu
-                        </Button>
-                        <Button variant={'contained'} color={'error'} style={{margin: "14px 0 0 14px"}}>Huỷ bỏ</Button>
+                        <h3>Tổng tiền: {currentSupplier?.total} VND</h3>
                     </FormContainer>
                 </Grid>
             </Grid>
