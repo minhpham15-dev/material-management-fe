@@ -131,8 +131,7 @@ export default function InvoicePage() {
             total: rowData.reduce((acc, v) => v.total + acc, 0),
             details: rowData.map((v) => ({specification_id: v.id, amount: v.amount}))
         }
-        axiosClient.post("/api/invoices", userData).then(res => console.log(res))
-        console.log(userData)
+        axiosClient.post("/api/invoices", userData).then(res => console.log("OK"))
     }
     const onAddNewItem = (value) => {
         const newTotal = value.price * value.amount + value.price * value.vat / 100

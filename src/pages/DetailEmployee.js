@@ -6,76 +6,67 @@ import { DatePickerElement, FormContainer, SelectElement, TextFieldElement } fro
 import dayjs from 'dayjs';
 
 export const genderConfig = {
-  Nam: 1,
-  Nữ: 0,
-};
-export const DetailEmployee = ({ data, setOpenModal }) => {
-  const [currentEmployee, setCurrentEmployee] = useState(null);
-  const [upload, setUpload] = useState(null);
-  const onSubmit = (values) => {
-    axiosClient.post(`/api/users/${data}`, values).then((res) => setOpenModal(false));
-  };
-  useEffect(() => {
-    axiosClient.get(`/api/users/${data}`).then((res) => setCurrentEmployee(res.data.data));
-  }, [data]);
-  const formContext = useForm({
-    defaultValues: {
-      name: currentEmployee?.name || '',
-      email: currentEmployee?.email || '',
-      phone: currentEmployee?.phone || '',
-      date_of_birth: currentEmployee?.date_of_birth || '',
-      address: currentEmployee?.address || '',
-      role: currentEmployee?.role || '',
-    },
-  });
-  useEffect(() => {
-    formContext.setValue('name', currentEmployee?.name || '');
-    formContext.setValue('email', currentEmployee?.email || '');
-    formContext.setValue('phone', currentEmployee?.phone || '');
-    formContext.setValue('date_of_birth', dayjs(currentEmployee?.date_of_birth ?? new Date()) || '');
-    formContext.setValue('address', currentEmployee?.address || '');
-    formContext.setValue('role', currentEmployee?.role || '');
-    formContext.setValue('is_male', genderConfig[currentEmployee?.gender] || '');
-  }, [currentEmployee]);
-  console.log(currentEmployee);
-  return (
-    <>
-      <Container style={{ transform: 'translate(0%, 50%)' }}>
-        <Card>
-          <Stack>
-            <Typography variant="h4" ml={5} mt={2} gutterBottom>
-              Chi tiết Nhân viên
-            </Typography>
-          </Stack>
-          <FormContainer
-            formContext={formContext}
-            onSuccess={(data) => {
-              onSubmit(data);
-            }}
-          >
-            <Stack direction="row" alignItems="flex-start" justifyContent="space-around" mt={5}>
-              <Stack
-                direction="column"
-                alignItems="normal"
-                justifyContent="space-between"
-                spacing={{ xs: 1, sm: 2, md: 4 }}
-              >
-                <TextFieldElement name="name" label="Tên nhân viên" required />
-                <SelectElement
-                  options={[
-                    {
-                      id: 1,
-                      label: 'Nam',
-                    },
-                    { id: 0, label: 'Nữ' },
-                  ]}
-                  name="is_male"
-                  label="Giới tính"
-                  required
-                />
-                <DatePickerElement name="date_of_birth" label="Ngày sinh" />
-                <TextFieldElement name="address" label="Địa chỉ" required />
-              </Stack>
+    "Nam": 1,
+    "Nữ": 0
+}
+export const DetailEmployee =  ({data, setOpenModal}) => {
+    const [currentEmployee, setCurrentEmployee] = useState(null)
+    const [upload, setUpload] = useState(null)
+    const onSubmit = (values) => {
+        axiosClient.post(`/api/users/${data}`, values).then(res => setOpenModal(false))
+    }
+    useEffect(()  => {
+        axiosClient.get(`/api/users/${data}`).then(res => setCurrentEmployee(res.data.data))
+    },[data])
+    const formContext = useForm({
+        defaultValues: {
+            name: currentEmployee?.name || "",
+            email: currentEmployee?.email || "",
+            phone: currentEmployee?.phone || "",
+            date_of_birth: currentEmployee?.date_of_birth || "",
+            address: currentEmployee?.address || "",
+            role: currentEmployee?.role || ""
+        }
+    });
+    useEffect(()=> {
+        formContext.setValue("name", currentEmployee?.name || "")
+        formContext.setValue("email", currentEmployee?.email || "")
+        formContext.setValue("phone", currentEmployee?.phone || "")
+        formContext.setValue("date_of_birth", dayjs(currentEmployee?.date_of_birth ?? new Date()) || "")
+        formContext.setValue("address", currentEmployee?.address || "")
+        formContext.setValue("role", currentEmployee?.role || "")
+        formContext.setValue("is_male", genderConfig[currentEmployee?.gender] || "")
+    }, [currentEmployee])
+    return <>
+        <Container style={{transform: 'translate(0%, 50%)'}}>
+            <Card>
+                <Stack>
+                    <Typography variant="h4" ml={5} mt={2} gutterBottom>
+                        Chi tiết Nhân viên
+                    </Typography>
+                </Stack>
+                <FormContainer
+                    formContext={formContext}
+                    onSuccess={(data) => {
+                        onSubmit(data);
+                    }}
+                >
+                    <Stack direction="row" alignItems="flex-start" justifyContent="space-around" mt={5}>
+                        <Stack
+                            direction="column"
+                            alignItems="normal"
+                            justifyContent="space-between"
+                            spacing={{xs: 1, sm: 2, md: 4}}
+                        >
+                            <TextFieldElement name="name" label="Tên nhân viên" required/>
+                            <SelectElement options={[{
+                                id: 1,
+                                label: 'Nam',
+                            },
+                                {id: 0, label: 'Nữ'},]} name="is_male" label="Giới tính" required/>
+                            <DatePickerElement name="date_of_birth" label="Ngày sinh" />
+                            <TextFieldElement name="address" label="Địa chỉ" required/>
+                        </Stack>
 
               <Stack
                 direction="column"
