@@ -4,6 +4,7 @@ import { NavLink as RouterLink } from 'react-router-dom';
 import { Box, List, ListItemText } from '@mui/material';
 //
 import { StyledNavItem, StyledNavItemIcon } from './styles';
+import { useState } from 'react';
 
 // ----------------------------------------------------------------------
 
@@ -30,25 +31,35 @@ NavItem.propTypes = {
 };
 
 function NavItem({ item }) {
-  const { title, path, icon, info } = item;
+  const { title, path, icon, info, children } = item;
+  const [open, setOpen] = useState(true);
 
+  const handleClick = () => {
+    setOpen(!open);
+  };
   return (
-    <StyledNavItem
-      component={RouterLink}
-      to={path}
-      sx={{
-        '&.active': {
-          color: 'text.primary',
-          bgcolor: 'action.selected',
-          fontWeight: 'fontWeightBold',
-        },
-      }}
-    >
-      <StyledNavItemIcon>{icon && icon}</StyledNavItemIcon>
+    <>
+      <StyledNavItem
+        component={RouterLink}
+        to={path}
+        sx={{
+          '&.active': {
+            color: 'text.primary',
+            bgcolor: 'action.selected',
+            fontWeight: 'fontWeightBold',
+          },
+        }}
+        onClick={handleClick}
+      >
+        <StyledNavItemIcon>{icon && icon}</StyledNavItemIcon>
 
-      <ListItemText disableTypography primary={title} />
+        <ListItemText disableTypography primary={title} />
 
-      {info && info}
-    </StyledNavItem>
+        {info && info}
+      </StyledNavItem>
+      {/*<Collapse in={open} timeout="auto" unmountOnExit>*/}
+      {/*  <NavSection data={children} />*/}
+      {/*</Collapse>*/}
+    </>
   );
 }

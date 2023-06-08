@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
-import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
+import { Avatar, Box, Divider, IconButton, MenuItem, Popover, Stack, Typography } from '@mui/material';
 // mocks_
-import {Navigate, useNavigate} from "react-router-dom";
-import account from '../../../_mock/account';
+import { useNavigate } from 'react-router-dom';
+import { axiosClient } from '../../../utils/axiosClient';
 
 // ----------------------------------------------------------------------
 
@@ -27,6 +27,13 @@ const MENU_OPTIONS = [
 
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
+  const [profile, setProfile] = useState(null);
+
+  const getProfile = async () => axiosClient.get('/api/profile');
+
+  useEffect(() => {
+    getProfile().then((res) => setProfile(res.data.data));
+  }, []);
   const navigate = useNavigate();
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -34,16 +41,20 @@ export default function AccountPopover() {
 
   const handleLogout = () => {
     localStorage.clear();
-    navigate("/login", {replace: true})
+    navigate('/login', { replace: true });
   };
 
   const handleClose = () => {
-    setOpen(!open)
-  }
+    setOpen(!open);
+  };
 
   const handleProfile = () => {
-    navigate("/profile")
-  }
+    navigate('/profile');
+  };
+
+  const handleHome = () => {
+    navigate('/home');
+  };
 
   return (
     <>
@@ -64,7 +75,7 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar src={account.photoURL} alt="photoURL" />
+        <Avatar src={profile?.avatar} alt="photoURL" />
       </IconButton>
 
       <Popover
@@ -88,22 +99,18 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {profile?.name}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+            {profile?.email}
           </Typography>
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Stack sx={{ p: 1 }}>
-          <MenuItem onClick={() => <Navigate to={'/home'} /> }>
-            Home
-          </MenuItem>
-          <MenuItem onClick={handleProfile}>
-            Profile
-          </MenuItem>
+          <MenuItem onClick={handleHome}>Trang chủ</MenuItem>
+          <MenuItem onClick={handleProfile}>Thông tin cá nhân</MenuItem>
         </Stack>
 
         <Divider sx={{ borderStyle: 'dashed' }} />

@@ -14,6 +14,7 @@ export default function ProfilePage() {
   useEffect(() => {
     getProfile().then((res) => setProfile(res.data.data));
   }, []);
+
   const formContext = useForm({
     defaultValues: {
       name: profile?.name || '',
@@ -22,6 +23,7 @@ export default function ProfilePage() {
       date_of_birth: profile?.date_of_birth || '',
       address: profile?.address || '',
       role: profile?.role || '',
+      is_male: profile?.is_male || '',
     },
   });
   useEffect(() => {

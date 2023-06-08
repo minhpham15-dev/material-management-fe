@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
 import { alpha, styled } from '@mui/material/styles';
 import { Avatar, Box, Drawer, Link, Typography } from '@mui/material';
 // mock
-import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
@@ -14,6 +13,7 @@ import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 //
 import navConfig from './config';
+import { axiosClient } from '../../../utils/axiosClient';
 
 // ----------------------------------------------------------------------
 
@@ -36,6 +36,13 @@ Nav.propTypes = {
 
 export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
+  const [profile, setProfile] = useState(null);
+
+  const getProfile = async () => axiosClient.get('/api/profile');
+
+  useEffect(() => {
+    getProfile().then((res) => setProfile(res.data.data));
+  }, []);
 
   const isDesktop = useResponsive('up', 'lg');
 
@@ -60,15 +67,15 @@ export default function Nav({ openNav, onCloseNav }) {
       <Box sx={{ mb: 5, mx: 2.5 }}>
         <Link underline="none">
           <StyledAccount>
-            <Avatar src={account.photoURL} alt="photoURL" />
+            <Avatar src={profile?.avatar} alt="photoURL" />
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {account.displayName}
+                {profile?.name}
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {account.role}
+                {profile?.role === 1 ? 'Quản lý' : 'Nhân viên'}
               </Typography>
             </Box>
           </StyledAccount>

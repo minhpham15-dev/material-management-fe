@@ -100,14 +100,13 @@ export default function EmployeePage() {
 
   const [employees, setEmployees] = useState([]);
   const [isDelete, setIsDelete] = useState(false);
-  const [isReloadTable, setIsReloadTable] = useState(false);
 
-  const getEmployees = async () => await axiosClient.get('/api/users');
+  const getEmployees = async () => await axiosClient.get(`/api/users?page=${page + 1}&per_page=${rowsPerPage}`);
   const deleteEmployee = async (id) => await axiosClient.delete(`/api/users/${id}`);
 
   useEffect(() => {
     getEmployees().then((res) => setEmployees(res.data.data));
-  }, [openModal, isReloadTable]);
+  }, [openModal, page, rowsPerPage, isDelete]);
   const handleOpenMenu = (event, id) => {
     setCurrentId(id);
     setOpen(event.currentTarget);
@@ -122,15 +121,6 @@ export default function EmployeePage() {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-
-  // const handleSelectAllClick = (event) => {
-  //   if (event.target.checked) {
-  //     const newSelecteds = USERLIST.map((n) => n.name);
-  //     setSelected(newSelecteds);
-  //     return;
-  //   }
-  //   setSelected([]);
-  // };
 
   const handleClick = (event, name) => {
     const selectedIndex = selected.indexOf(name);
@@ -164,11 +154,10 @@ export default function EmployeePage() {
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - employees.length) : 0;
 
   const handleDeleteUser = (id) => {
-    console.log('delete');
     deleteEmployee(id).then((res) => {
-      console.log(res);
       setIsDelete(false);
-      setIsReloadTable(true);
+      setOpenModal(false);
+      handleCloseMenu();
     });
   };
 
@@ -264,13 +253,13 @@ export default function EmployeePage() {
                           }}
                         >
                           <Typography variant="h6" paragraph>
-                            Không tìm thấy dữ liệu
+                            Không tìm thấy kết quả
                           </Typography>
 
                           <Typography variant="body2">
                             Không tìm thấy kết quả cho &nbsp;
                             <strong>&quot;{filterName}&quot;</strong>.
-                            <br /> Vui lòng kiểm tra lại các ký tự hoặc từ muốn tìm kiếm.
+                            <br /> Vui lòng kiểm tra lại các ký tự muốn tìm kiếm.
                           </Typography>
                         </Paper>
                       </TableCell>
@@ -281,15 +270,17 @@ export default function EmployeePage() {
             </TableContainer>
           </Scrollbar>
 
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={employees.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
+          {employees.length && (
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={employees.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          )}
         </Card>
       </Container>
 
@@ -336,16 +327,13 @@ export default function EmployeePage() {
       >
         <DialogTitle id="alert-dialog-title">{'Xóa nhân viên?'}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Let Google help apps determine location. This means sending anonymous location data to Google, even when no
-            apps are running.
-          </DialogContentText>
+          <DialogContentText id="alert-dialog-description">Bạn có chắc chắn muốn xóa nhân viên này?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button variant="contained" onClick={() => setIsDelete(false)}>
             Quay lại
           </Button>
-          <Button variant="contained" onClick={handleDeleteUser(currentId)} autoFocus>
+          <Button variant="contained" onClick={() => handleDeleteUser(currentId)}>
             Đồng ý
           </Button>
         </DialogActions>

@@ -1,14 +1,14 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 // @mui
 import {
-  Button,
   Card,
   Checkbox,
   Container,
   IconButton,
-  MenuItem, Modal,
+  MenuItem,
+  Modal,
   Paper,
   Popover,
   Stack,
@@ -28,9 +28,9 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
 import INVOICELIST from '../_mock/inovice';
 import { ButtonAdd } from '../components/button/create-button/ButtonAdd';
-import {DetailSupplier} from "./DetailSupplier";
-import {axiosClient} from "../utils/axiosClient";
-import DetailInvoice from "./DetailInvoice";
+import { axiosClient } from '../utils/axiosClient';
+import DetailInvoice from './DetailInvoice';
+import { fDate } from '../utils/formatTime';
 
 // ----------------------------------------------------------------------
 
@@ -89,9 +89,14 @@ export default function InvoiceListPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const [openModal, setOpenModal] = useState(false);
+  const [currentId, setCurrentId] = useState(null);
+  const [invoices, setInvoice] = useState([]);
+  const [totalItem, setTotalItem] = useState(0);
+
   const handleOpenMenu = (event, id) => {
     setOpen(event.currentTarget);
-    setCurrentId(id)
+    setCurrentId(id);
   };
 
   const handleCloseMenu = () => {
@@ -147,12 +152,13 @@ export default function InvoiceListPage() {
   const filteredUsers = applySortFilter(INVOICELIST, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
-  const [openModal, setOpenModal] = useState(false);
-  const [currentId, setCurrentId] = useState(null);
-  const [invoices, setInvoice] = useState([])
+
   useEffect(() => {
-    axiosClient.get("/api/invoices").then(res => setInvoice(res.data.data))
-  },[])
+    axiosClient.get(`/api/invoices?page=${page + 1}&per_page=${rowsPerPage}`).then((res) => {
+      setInvoice(res.data.data);
+      setTotalItem(res.data.meta.total);
+    });
+  }, []);
   return (
     <>
       <Helmet>
@@ -177,7 +183,7 @@ export default function InvoiceListPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={INVOICELIST.length}
+                  rowCount={invoices.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
@@ -194,7 +200,7 @@ export default function InvoiceListPage() {
 
                         <TableCell align="left">{id}</TableCell>
 
-                        <TableCell align="left">{created_at}</TableCell>
+                        <TableCell align="left">{fDate(created_at)}</TableCell>
 
                         <TableCell align="left">{customer_name}</TableCell>
 
@@ -214,11 +220,11 @@ export default function InvoiceListPage() {
                       </TableRow>
                     );
                   })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
+                  {/*{emptyRows > 0 && (*/}
+                  {/*  <TableRow style={{ height: 53 * emptyRows }}>*/}
+                  {/*    <TableCell colSpan={6} />*/}
+                  {/*  </TableRow>*/}
+                  {/*)}*/}
                 </TableBody>
 
                 {isNotFound && (
@@ -231,13 +237,13 @@ export default function InvoiceListPage() {
                           }}
                         >
                           <Typography variant="h6" paragraph>
-                            Not found
+                            Không tìm thấy kết quả
                           </Typography>
 
                           <Typography variant="body2">
-                            No results found for &nbsp;
+                            Không tìm thấy kết quả cho &nbsp;
                             <strong>&quot;{filterName}&quot;</strong>.
-                            <br /> Try checking for typos or using complete words.
+                            <br /> Vui lòng kiểm tra lại các ký tự muốn tìm kiếm.
                           </Typography>
                         </Paper>
                       </TableCell>
@@ -251,7 +257,7 @@ export default function InvoiceListPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={INVOICELIST.length}
+            count={totalItem}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -283,8 +289,11 @@ export default function InvoiceListPage() {
           Xem
         </MenuItem>
       </Popover>
-      <Modal open={openModal} children={<DetailInvoice data={currentId} setOpenModal={setOpenModal}/>}
-             onClose={() => setOpenModal(false)}/>
+      <Modal
+        open={openModal}
+        children={<DetailInvoice data={currentId} setOpenModal={setOpenModal} />}
+        onClose={() => setOpenModal(false)}
+      />
     </>
   );
 }

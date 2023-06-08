@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import ReactApexChart from 'react-apexcharts';
 // @mui
-import { Card, CardHeader, Box } from '@mui/material';
+import { Box, Card, CardHeader } from '@mui/material';
 // components
 import { useChart } from '../../../components/chart';
 
@@ -19,14 +19,17 @@ export default function AppWebsiteVisits({ title, subheader, chartLabels, chartD
     plotOptions: { bar: { columnWidth: '16%' } },
     fill: { type: chartData.map((i) => i.fill) },
     labels: chartLabels,
-    xaxis: { type: 'datetime' },
+    xaxis: {
+      // type: 'datetime',
+      category: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+    },
     tooltip: {
       shared: true,
       intersect: false,
       y: {
         formatter: (y) => {
           if (typeof y !== 'undefined') {
-            return `${y.toFixed(0)} visits`;
+            return `${y.toFixed(0)} VND`;
           }
           return y;
         },
