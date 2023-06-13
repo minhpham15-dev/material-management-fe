@@ -41,7 +41,7 @@ import DetailProducts from './DetailProducts';
 const TABLE_HEAD = [
   { id: 'name', label: 'Tên', alignRight: false },
   { id: 'amount', label: 'Số lượng', alignRight: false },
-  { id: 'productType', label: 'Phân loại', alignRight: false },
+  { id: 'product_types', label: 'Phân loại', alignRight: false },
   { id: 'tax', label: 'Thuế', alignRight: false },
   { id: 'price', label: 'Đơn giá', alignRight: false },
   { id: 'supplier', label: 'Nhà cung cấp', alignRight: false },
@@ -228,6 +228,7 @@ export default function ProductsPage() {
                     ? products.map((row) => {
                         const { id, name, current_amount, tax, price, brand_name, product_types } = row;
                         const selectedUser = selected.indexOf(name) !== -1;
+                        const productName = product_types && product_types[0]?.name;
                         return (
                           <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
                             <TableCell padding="checkbox">
@@ -244,7 +245,7 @@ export default function ProductsPage() {
 
                             <TableCell align="left">{current_amount}</TableCell>
 
-                            <TableCell align="left">{product_types[0]?.name}</TableCell>
+                            <TableCell align="left">{productName}</TableCell>
 
                             <TableCell align="left">{tax}</TableCell>
 

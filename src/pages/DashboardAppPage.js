@@ -116,6 +116,7 @@ export default function DashboardAppPage() {
                 { label: 'Sắt', value: 4344 },
                 { label: 'Thép', value: 5435 },
                 { label: 'Tôn', value: 1443 },
+                { label: 'Nhôm', value: 0 },
               ]}
               chartColors={[theme.palette.primary.main, theme.palette.warning.main, theme.palette.error.main]}
             />

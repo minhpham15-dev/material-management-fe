@@ -7,17 +7,23 @@ import { axiosClient } from '../utils/axiosClient';
 import { ButtonBack } from '../components/button/back-button/ButtonBack';
 
 export default function CreateProductPage() {
-  const productTypeList = [
-    { id: 1, label: 'Hộp' },
-    { id: 2, label: 'Tròn đặc' },
-    { id: 3, label: 'Chữ H' },
-  ];
-  const categoryList = [
-    { id: 1, label: 'Sắt' },
-    { id: 2, label: 'Nhôm' },
-    { id: 3, label: 'Thép' },
-  ];
-  const filterOptions = SUPPLIERLIST.map((sup) => ({ id: sup.id, label: sup.name }));
+  const [productType, setProductType] = useState([]);
+  const [category, setCategory] = useState([]);
+  const [supplier, setSupplier] = useState([]);
+
+  const getTypes = async () => await axiosClient.get('/api/product-types');
+  const getCate = async () => await axiosClient.get('/api/categories');
+
+  const getSup = async () => await axiosClient.get('/api/suppliers');
+
+  useEffect(() => {
+    getTypes().then((res) =>
+      setProductType(res.data.data.filter((t) => t.parent_id !== null).map((t) => ({ id: t.id, label: t.name })))
+    );
+    getCate().then((res) => setCategory(res.data.data.map((c) => ({ id: c.id, label: c.name }))));
+    getSup().then((res) => setSupplier(res.data.data.map((s) => ({ id: s.id, label: s.name }))));
+  }, []);
+
   const [units, setUnits] = useState([]);
   useEffect(() => {
     axiosClient.get('/api/units').then((res) =>
@@ -31,7 +37,7 @@ export default function CreateProductPage() {
       )
     );
   }, []);
-  console.log(units);
+
   return (
     <>
       <Helmet>Thêm mới nguyên vật liệu</Helmet>
@@ -49,7 +55,7 @@ export default function CreateProductPage() {
                 category_id: data.category,
                 name: data.name,
                 unit_id: data.unit,
-                brand_name: data.supplier,
+                brand_name: supplier.filter((s) => s.id === data.supplier)[0].label,
                 tax: data.tax,
               });
             }}
@@ -62,13 +68,13 @@ export default function CreateProductPage() {
                 spacing={{ xs: 1, sm: 2, md: 4 }}
               >
                 <TextFieldElement name="name" label="Tên nguyên vật liệu" required />
-                <SelectElement name="category" label="Loại mặt hàng" options={categoryList} required />
-                <SelectElement name="productType" label="Phân loại" options={productTypeList} required />
+                <SelectElement name="category" label="Loại mặt hàng" options={category} required />
+                <SelectElement name="productType" label="Phân loại" options={productType} required />
                 <SelectElement name="unit" label="Đơn vị" options={units} required />
               </Stack>
 
               <Stack direction="column" width={221} spacing={{ xs: 1, sm: 2, md: 4 }}>
-                <SelectElement name="supplier" label="Nhà cung cấp" required options={filterOptions} />
+                <SelectElement name="supplier" label="Nhà cung cấp" required options={supplier} />
                 <TextFieldElement name="tax" label="Thuế(%)" required />
               </Stack>
             </Stack>
