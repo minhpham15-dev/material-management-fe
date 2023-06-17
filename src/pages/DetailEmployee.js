@@ -4,18 +4,26 @@ import { useForm } from 'react-hook-form';
 import { Avatar, Button, Card, Container, Stack, Typography } from '@mui/material';
 import { DatePickerElement, FormContainer, SelectElement, TextFieldElement } from 'react-hook-form-mui';
 import dayjs from 'dayjs';
+import { fDate } from '../utils/formatTime';
 
 // export const genderConfig = {
 //   Nam: 1,
 //   Nữ: 0,
 // };
-export const DetailEmployee = ({ data, setOpenModal }) => {
+export const DetailEmployee = ({ data, setOpenModal, setOpenPopover }) => {
   const [currentEmployee, setCurrentEmployee] = useState(null);
   const [upload, setUpload] = useState(null);
   const onSubmit = (values) => {
-    const formSubmit = { ...values, date_of_birth: dayjs(values.date_of_birth, 'YYYY-MM-DD') };
-    console.log(formSubmit);
-    axiosClient.patch(`/api/users/${data}`, formSubmit).then((res) => setOpenModal(false));
+    const formSubmit = {
+      ...values,
+      date_of_birth: fDate(values.date_of_birth, 'yyyy-MM-dd'),
+      is_male: values.is_male === 1,
+    };
+    // console.log(formSubmit);
+    axiosClient.patch(`/api/users/${data}`, formSubmit).then((res) => {
+      setOpenModal(false);
+      setOpenPopover(false);
+    });
   };
   useEffect(() => {
     axiosClient.get(`/api/users/${data}`).then((res) => setCurrentEmployee(res.data.data));
@@ -28,7 +36,7 @@ export const DetailEmployee = ({ data, setOpenModal }) => {
       date_of_birth: currentEmployee?.date_of_birth || '',
       address: currentEmployee?.address || '',
       role: currentEmployee?.role || '',
-      is_male: currentEmployee?.is_male || '',
+      is_male: currentEmployee?.is_male ? 1 : 2 || '',
     },
   });
   useEffect(() => {
@@ -38,7 +46,7 @@ export const DetailEmployee = ({ data, setOpenModal }) => {
     formContext.setValue('date_of_birth', dayjs(currentEmployee?.date_of_birth ?? new Date()) || '');
     formContext.setValue('address', currentEmployee?.address || '');
     formContext.setValue('role', currentEmployee?.role || '');
-    formContext.setValue('is_male', currentEmployee?.is_male || '');
+    formContext.setValue('is_male', currentEmployee?.is_male ? 1 : 2 || '');
   }, [currentEmployee]);
   return (
     <>

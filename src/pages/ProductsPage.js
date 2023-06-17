@@ -98,9 +98,9 @@ export default function ProductsPage() {
   const [currentId, setCurrentId] = useState(null);
   const [isDelete, setIsDelete] = useState(false);
   const [totalItem, setTotalItem] = useState(0);
-  const getSuppliers = async () => await axiosClient.get(`/api/products?page=${page + 1}&per_page=${rowsPerPage}`);
+  const getSuppliers = async (name) =>
+    await axiosClient.get(`/api/products?name=${name}&page=${page + 1}&per_page=${rowsPerPage}`);
   const deleteProduct = async (id) => await axiosClient.delete(`api/products/${id}`);
-  const findProduct = async (name) => await axiosClient.get(`/api/products?name=${name}`);
 
   const handleOpenMenu = (event, id) => {
     setCurrentId(id);
@@ -154,28 +154,8 @@ export default function ProductsPage() {
     setFilterName(event.target.value);
   };
   useEffect(() => {
-    findProduct(filterName).then((res) => {
-      Promise.all(
-        res.data.data.map(async (v) => {
-          const res = await axiosClient.get(`/api/products/${v.id}/specifications`);
-          return { ...res.data.data[0], ...v };
-        })
-      ).then((res) => {
-        setProducts(res);
-      });
-      setTotalItem(res.data.meta.total);
-    });
-  }, [filterName]);
-
-  // const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - products.length) : 0;
-
-  const filteredUsers = applySortFilter(products, getComparator(order, orderBy), filterName);
-
-  const isNotFound = !filteredUsers.length && !!filterName;
-
-  useEffect(() => {
-    !filterName &&
-      getSuppliers().then((res) => {
+    const getData = setTimeout(() => {
+      getSuppliers(filterName).then((res) => {
         Promise.all(
           res.data.data.map(async (v) => {
             const res = await axiosClient.get(`/api/products/${v.id}/specifications`);
@@ -186,7 +166,30 @@ export default function ProductsPage() {
         });
         setTotalItem(res.data.meta.total);
       });
-  }, [openModal, isDelete, page, rowsPerPage]);
+    }, 500);
+    return () => clearTimeout(getData);
+  }, [filterName, openModal, isDelete, page, rowsPerPage]);
+
+  // const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - products.length) : 0;
+
+  const filteredUsers = applySortFilter(products, getComparator(order, orderBy), filterName);
+
+  const isNotFound = !filteredUsers.length && !!filterName;
+
+  // useEffect(() => {
+  //   !filterName &&
+  //     getSuppliers().then((res) => {
+  //       Promise.all(
+  //         res.data.data.map(async (v) => {
+  //           const res = await axiosClient.get(`/api/products/${v.id}/specifications`);
+  //           return { ...res.data.data[0], ...v };
+  //         })
+  //       ).then((res) => {
+  //         setProducts(res);
+  //       });
+  //       setTotalItem(res.data.meta.total);
+  //     });
+  // }, []);
 
   const handleDeleteItem = (id) => {
     deleteProduct(id).then((res) => {
@@ -224,48 +227,47 @@ export default function ProductsPage() {
                   // onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {!isNotFound
-                    ? products.map((row) => {
-                        const { id, name, current_amount, tax, price, brand_name, product_types } = row;
-                        const selectedUser = selected.indexOf(name) !== -1;
-                        const productName = product_types && product_types[0]?.name;
-                        return (
-                          <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
-                            <TableCell padding="checkbox">
-                              <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
-                            </TableCell>
+                  {products &&
+                    products.map((row) => {
+                      const { id, name, current_amount, tax, price, brand_name, product_types } = row;
+                      const selectedUser = selected.indexOf(name) !== -1;
+                      const productName = product_types && product_types[0]?.name;
+                      return (
+                        <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                          <TableCell padding="checkbox">
+                            <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
+                          </TableCell>
 
-                            <TableCell component="th" scope="row" padding="none">
-                              <Stack direction="row" alignItems="center" spacing={2}>
-                                <Typography variant="subtitle2" noWrap>
-                                  {name}
-                                </Typography>
-                              </Stack>
-                            </TableCell>
+                          <TableCell component="th" scope="row" padding="none">
+                            <Stack direction="row" alignItems="center" spacing={2}>
+                              <Typography variant="subtitle2" noWrap>
+                                {name}
+                              </Typography>
+                            </Stack>
+                          </TableCell>
 
-                            <TableCell align="left">{current_amount}</TableCell>
+                          <TableCell align="left">{current_amount}</TableCell>
 
-                            <TableCell align="left">{productName}</TableCell>
+                          <TableCell align="left">{productName}</TableCell>
 
-                            <TableCell align="left">{tax}</TableCell>
+                          <TableCell align="left">{tax}</TableCell>
 
-                            <TableCell align="left">{price}</TableCell>
+                          <TableCell align="left">{price}</TableCell>
 
-                            <TableCell align="left">{brand_name}</TableCell>
+                          <TableCell align="left">{brand_name}</TableCell>
 
-                            {/* <TableCell align="left"> */}
-                            {/*  <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label> */}
-                            {/* </TableCell> */}
+                          {/* <TableCell align="left"> */}
+                          {/*  <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label> */}
+                          {/* </TableCell> */}
 
-                            <TableCell align="right">
-                              <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, id)}>
-                                <Iconify icon={'eva:more-vertical-fill'} />
-                              </IconButton>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })
-                    : null}
+                          <TableCell align="right">
+                            <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, id)}>
+                              <Iconify icon={'eva:more-vertical-fill'} />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   {/*{emptyRows > 0 && (*/}
                   {/*  <TableRow style={{ height: 53 }}>*/}
                   {/*    <TableCell colSpan={6} />*/}
@@ -273,7 +275,7 @@ export default function ProductsPage() {
                   {/*)}*/}
                 </TableBody>
 
-                {isNotFound && (
+                {!products.length && (
                   <TableBody>
                     <TableRow>
                       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
@@ -300,7 +302,7 @@ export default function ProductsPage() {
             </TableContainer>
           </Scrollbar>
 
-          {!isNotFound && (
+          {products.length ? (
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
@@ -310,7 +312,7 @@ export default function ProductsPage() {
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
-          )}
+          ) : null}
         </Card>
       </Container>
 

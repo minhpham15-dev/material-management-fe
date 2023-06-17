@@ -100,12 +100,16 @@ export default function EmployeePage() {
 
   const [employees, setEmployees] = useState([]);
   const [isDelete, setIsDelete] = useState(false);
+  const [totalItem, setTotalItem] = useState(0);
 
   const getEmployees = async () => await axiosClient.get(`/api/users?page=${page + 1}&per_page=${rowsPerPage}`);
   const deleteEmployee = async (id) => await axiosClient.delete(`/api/users/${id}`);
 
   useEffect(() => {
-    getEmployees().then((res) => setEmployees(res.data.data));
+    getEmployees().then((res) => {
+      setEmployees(res.data.data);
+      setTotalItem(res.data.meta.total);
+    });
   }, [openModal, page, rowsPerPage, isDelete]);
   const handleOpenMenu = (event, id) => {
     setCurrentId(id);
@@ -236,11 +240,11 @@ export default function EmployeePage() {
                         </TableRow>
                       );
                     })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
+                  {/*{emptyRows > 0 && (*/}
+                  {/*  <TableRow style={{ height: 53 * emptyRows }}>*/}
+                  {/*    <TableCell colSpan={6} />*/}
+                  {/*  </TableRow>*/}
+                  {/*)}*/}
                 </TableBody>
 
                 {!employees.length && (
@@ -270,17 +274,17 @@ export default function EmployeePage() {
             </TableContainer>
           </Scrollbar>
 
-          {employees.length && (
+          {employees.length ? (
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
-              count={employees.length}
+              count={totalItem}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
-          )}
+          ) : null}
         </Card>
       </Container>
 
@@ -315,7 +319,7 @@ export default function EmployeePage() {
 
       <Modal
         open={openModal}
-        children={<DetailEmployee data={currentId} setOpenModal={setOpenModal} />}
+        children={<DetailEmployee data={currentId} setOpenModal={setOpenModal} setOpenPopover={setOpen} />}
         onClose={() => setOpenModal(false)}
       />
 

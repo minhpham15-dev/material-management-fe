@@ -93,15 +93,26 @@ export default function SupplierPage() {
   const [openModal, setOpenModal] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [isDelete, setIsDelete] = useState(false);
-  const getSuppliers = async () => await axiosClient.get(`/api/suppliers?page=${page + 1}&per_page=${rowsPerPage}`);
+  const getSuppliers = async (name) =>
+    await axiosClient.get(`/api/suppliers?name=${name}&page=${page + 1}&per_page=${rowsPerPage}`);
   const deleteSuppliers = async (id) => await axiosClient.delete(`/api/suppliers/${id}`);
 
+  // useEffect(() => {
+  //   getSuppliers().then((res) => {
+  //     setSuppliers(res.data.data);
+  //     setTotalItem(res.data.meta.total);
+  //   });
+  // }, []);
+
   useEffect(() => {
-    getSuppliers().then((res) => {
-      setSuppliers(res.data.data);
-      setTotalItem(res.data.meta.total);
-    });
-  }, [openModal, rowsPerPage, page, isDelete]);
+    const getData = setTimeout(() => {
+      getSuppliers(filterName).then((res) => {
+        setSuppliers(res.data.data);
+        setTotalItem(res.data.meta.total);
+      });
+    }, 1000);
+    return () => clearTimeout(getData);
+  }, [filterName, openModal, rowsPerPage, page, isDelete]);
   const handleOpenMenu = (event, id) => {
     setCurrentId(id);
     setOpen(event.currentTarget);
@@ -262,15 +273,17 @@ export default function SupplierPage() {
             </TableContainer>
           </Scrollbar>
 
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={totalItem}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
+          {suppliers.length ? (
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={totalItem}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          ) : null}
         </Card>
       </Container>
 

@@ -77,10 +77,10 @@ const DetailProducts = ({ data, setOpenModal, setOpenPopover }) => {
                 justifyContent="space-around"
                 spacing={{ xs: 1, sm: 2, md: 4 }}
               >
-                <TextFieldElement name="brand_name" label="Nhà cung cấp" disabled={true} />
-                <TextFieldElement name="current_amount" label="Số lượng" required disabled={true} />
+                <TextFieldElement name="brand_name" label="Nhãn hiệu" required />
+                <TextFieldElement name="current_amount" label="Số lượng" disabled={true} />
                 <TextFieldElement name="tax" label="Thuế" required />
-                <TextFieldElement name="price" label="Đơn giá" required disabled={true} />
+                <TextFieldElement name="price" label="Đơn giá" disabled={true} />
               </Stack>
             </Stack>
             <Stack direction="row" alignItems="center" justifyContent="end" mb={2} mt={5} mr={10} spacing={5}>
