@@ -28,11 +28,11 @@ export default function ProfilePage() {
   });
   useEffect(() => {
     formContext.setValue('name', profile?.name || '');
-    formContext.setValue('is_male', profile?.is_male || '');
+    formContext.setValue('is_male', profile?.is_male ? 'Nam' : 'Nữ' || '');
     formContext.setValue('date_of_birth', dayjs(profile?.date_of_birth ?? new Date()) || '');
     formContext.setValue('address', profile?.address || '');
     formContext.setValue('phone', profile?.phone || '');
-    formContext.setValue('role', profile?.role || '');
+    formContext.setValue('role', profile?.role === 1 ? 'Quản lý' : 'Nhân viên' || '');
     formContext.setValue('email', profile?.email || '');
   }, [profile]);
   console.log(profile);
@@ -66,10 +66,10 @@ export default function ProfilePage() {
                 spacing={{ xs: 1, sm: 2, md: 4 }}
                 mb={5}
               >
-                <TextFieldElement name="name" label="Tên" />
-                <TextFieldElement name="is_male" label="Giới tính" />
-                <DatePickerElement name="date_of_birth" label="Ngày sinh" />
-                <TextFieldElement name="address" label="Địa chỉ" />
+                <TextFieldElement name="name" label="Tên" disabled />
+                <TextFieldElement name="is_male" label="Giới tính" disabled />
+                <DatePickerElement name="date_of_birth" label="Ngày sinh" disabled />
+                <TextFieldElement name="address" label="Địa chỉ" disabled />
               </Stack>
 
               <Stack
@@ -79,9 +79,9 @@ export default function ProfilePage() {
                 spacing={{ xs: 1, sm: 2, md: 4 }}
                 mb={5}
               >
-                <TextFieldElement name="phone" label="Số điện thoại" />
-                <TextFieldElement name="role" label="Chức vụ" />
-                <TextFieldElement name="email" label="Email" />
+                <TextFieldElement name="phone" label="Số điện thoại" disabled />
+                <TextFieldElement name="role" label="Chức vụ" disabled />
+                <TextFieldElement name="email" label="Email" disabled />
               </Stack>
             </Stack>
           </FormContainer>

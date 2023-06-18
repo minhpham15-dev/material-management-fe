@@ -6,23 +6,20 @@ import { useEffect, useState } from 'react';
 import { axiosClient } from '../utils/axiosClient';
 import { ButtonBack } from '../components/button/back-button/ButtonBack';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export default function CreateProductPage() {
   const [productType, setProductType] = useState([]);
   const [category, setCategory] = useState([]);
-  const [supplier, setSupplier] = useState([]);
   const navigate = useNavigate();
   const getTypes = async () => await axiosClient.get('/api/product-types');
   const getCate = async () => await axiosClient.get('/api/categories');
-
-  const getSup = async () => await axiosClient.get('/api/suppliers');
 
   useEffect(() => {
     getTypes().then((res) =>
       setProductType(res.data.data.filter((t) => t.parent_id !== null).map((t) => ({ id: t.id, label: t.name })))
     );
     getCate().then((res) => setCategory(res.data.data.map((c) => ({ id: c.id, label: c.name }))));
-    getSup().then((res) => setSupplier(res.data.data.map((s) => ({ id: s.id, label: s.name }))));
   }, []);
 
   const [units, setUnits] = useState([]);
@@ -38,6 +35,25 @@ export default function CreateProductPage() {
       )
     );
   }, []);
+  const onSuccess = (data) => {
+    axiosClient
+      .post('/api/products', {
+        category_id: data.category,
+        name: data.name,
+        unit_id: data.unit,
+        brand_name: data.brand_name,
+        tax: data.tax,
+      })
+      .then((res) => {
+        console.log(res);
+        if (res.data.message === 'Successful') {
+          toast.success('Thành công', { autoClose: 2000 });
+          navigate(-1);
+        } else {
+          toast.error('Thất bại! Xin vui lòng thử lại', { autoClose: 2000 });
+        }
+      });
+  };
 
   return (
     <>
@@ -50,21 +66,7 @@ export default function CreateProductPage() {
           </Typography>
         </Stack>
         <Card>
-          <FormContainer
-            onSuccess={(data) => {
-              axiosClient
-                .post('/api/products', {
-                  category_id: data.category,
-                  name: data.name,
-                  unit_id: data.unit,
-                  brand_name: data.brand_name,
-                  tax: data.tax,
-                })
-                .then((res) => {
-                  res.message === 'Successful' && navigate(-1);
-                });
-            }}
-          >
+          <FormContainer onSuccess={onSuccess}>
             <Stack direction="row" alignItems="flex-start" justifyContent="space-around" mt={5}>
               <Stack
                 direction="column"

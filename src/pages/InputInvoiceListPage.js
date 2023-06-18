@@ -161,7 +161,7 @@ export default function InputInvoiceListPage() {
       setInvoiceList(res.data.data);
       setTotalItem(res.data.meta.total);
     });
-  }, []);
+  }, [page, rowsPerPage]);
   return (
     <>
       <Helmet>

@@ -158,7 +158,7 @@ export default function InvoiceListPage() {
       setInvoice(res.data.data);
       setTotalItem(res.data.meta.total);
     });
-  }, []);
+  }, [page, rowsPerPage]);
   return (
     <>
       <Helmet>

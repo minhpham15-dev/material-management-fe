@@ -18,6 +18,8 @@ const DetailInputInvoice = ({ data, setOpenModal }) => {
   const [currentSupplier, setCurrentSupplier] = useState(null);
   console.log('currentSupplier', currentSupplier);
   const [rowData, setRowData] = useState([]);
+  const [isBank, setIsBank] = useState(false);
+
   useEffect(() => {
     axiosClient.get(`/api/input-invoices/${data}`).then((res) => setCurrentSupplier(res.data.data));
   }, [data]);
@@ -29,6 +31,8 @@ const DetailInputInvoice = ({ data, setOpenModal }) => {
       payment_method: currentSupplier?.payment_method || '',
       user: currentSupplier?.user.name || '',
       created_at: fDate(currentSupplier?.created_at) || '',
+      supplier_bank: currentSupplier?.supplier_bank || '',
+      supplier_bank_account_number: currentSupplier?.supplier_bank_account_number || '',
     },
   });
   useEffect(() => {
@@ -38,6 +42,9 @@ const DetailInputInvoice = ({ data, setOpenModal }) => {
     formContext.setValue('user', currentSupplier?.user.name || '');
     formContext.setValue('created_at', fDate(currentSupplier?.created_at) || '');
     formContext.setValue('payment_method', currentSupplier?.payment_method === 'Tiền mặt' ? 1 : 2 || '');
+    setIsBank(currentSupplier?.payment_method !== 'Tiền mặt');
+    formContext.setValue('supplier_bank', currentSupplier?.supplier_bank || '');
+    formContext.setValue('supplier_bank_account_number', currentSupplier?.supplier_bank_account_number || '');
   }, [currentSupplier]);
   useEffect(() => {
     if (currentSupplier?.details) {
@@ -49,7 +56,7 @@ const DetailInputInvoice = ({ data, setOpenModal }) => {
             name: v.commodity.specification.product.name,
             vat: v.commodity.specification.product.tax,
             amount: v.amount,
-            price: v.commodity.specification.price,
+            price: v.price,
             unit: res.data.data.name,
           };
         })
@@ -137,6 +144,26 @@ const DetailInputInvoice = ({ data, setOpenModal }) => {
                 ]}
               />
             </Stack>
+            {isBank && (
+              <>
+                <TextFieldElement
+                  name="supplier_bank"
+                  label="Ngân hàng"
+                  fullWidth
+                  style={{ marginTop: '14px' }}
+                  disabled
+                />{' '}
+                <br />
+                <TextFieldElement
+                  name="supplier_bank_account_number"
+                  label="STK NCC"
+                  fullWidth
+                  style={{ marginTop: '14px' }}
+                  disabled
+                />{' '}
+                <br />
+              </>
+            )}
             <h3>Tổng tiền: {currentSupplier?.total} VND</h3>
           </FormContainer>
         </Grid>
