@@ -102,15 +102,20 @@ export default function EmployeePage() {
   const [isDelete, setIsDelete] = useState(false);
   const [totalItem, setTotalItem] = useState(0);
 
-  const getEmployees = async () => await axiosClient.get(`/api/users?page=${page + 1}&per_page=${rowsPerPage}`);
+  const getEmployees = async (name) =>
+    await axiosClient.get(`/api/users?name=${name}&page=${page + 1}&per_page=${rowsPerPage}`);
   const deleteEmployee = async (id) => await axiosClient.delete(`/api/users/${id}`);
 
   useEffect(() => {
-    getEmployees().then((res) => {
-      setEmployees(res.data.data);
-      setTotalItem(res.data.meta.total);
-    });
-  }, [openModal, page, rowsPerPage, isDelete]);
+    const getData = setTimeout(() => {
+      getEmployees(filterName).then((res) => {
+        setEmployees(res.data.data);
+        setTotalItem(res.data.meta.total);
+      });
+    }, 1000);
+    return () => clearTimeout(getData);
+  }, [filterName, openModal, page, rowsPerPage, isDelete]);
+
   const handleOpenMenu = (event, id) => {
     setCurrentId(id);
     setOpen(event.currentTarget);
@@ -154,8 +159,6 @@ export default function EmployeePage() {
     setPage(0);
     setFilterName(event.target.value);
   };
-
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - employees.length) : 0;
 
   const handleDeleteUser = (id) => {
     deleteEmployee(id).then((res) => {

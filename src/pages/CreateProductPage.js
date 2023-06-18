@@ -5,12 +5,13 @@ import { FormContainer, SelectElement, TextFieldElement } from 'react-hook-form-
 import { useEffect, useState } from 'react';
 import { axiosClient } from '../utils/axiosClient';
 import { ButtonBack } from '../components/button/back-button/ButtonBack';
+import { useNavigate } from 'react-router-dom';
 
 export default function CreateProductPage() {
   const [productType, setProductType] = useState([]);
   const [category, setCategory] = useState([]);
   const [supplier, setSupplier] = useState([]);
-
+  const navigate = useNavigate();
   const getTypes = async () => await axiosClient.get('/api/product-types');
   const getCate = async () => await axiosClient.get('/api/categories');
 
@@ -51,13 +52,17 @@ export default function CreateProductPage() {
         <Card>
           <FormContainer
             onSuccess={(data) => {
-              axiosClient.post('/api/products', {
-                category_id: data.category,
-                name: data.name,
-                unit_id: data.unit,
-                brand_name: supplier.filter((s) => s.id === data.supplier)[0].label,
-                tax: data.tax,
-              });
+              axiosClient
+                .post('/api/products', {
+                  category_id: data.category,
+                  name: data.name,
+                  unit_id: data.unit,
+                  brand_name: data.brand_name,
+                  tax: data.tax,
+                })
+                .then((res) => {
+                  res.message === 'Successful' && navigate(-1);
+                });
             }}
           >
             <Stack direction="row" alignItems="flex-start" justifyContent="space-around" mt={5}>
@@ -74,7 +79,7 @@ export default function CreateProductPage() {
               </Stack>
 
               <Stack direction="column" width={221} spacing={{ xs: 1, sm: 2, md: 4 }}>
-                <SelectElement name="supplier" label="Nhà cung cấp" required options={supplier} />
+                <TextFieldElement name="brand_name" label="Nhãn hiệu" required />
                 <TextFieldElement name="tax" label="Thuế(%)" required />
               </Stack>
             </Stack>

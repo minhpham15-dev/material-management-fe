@@ -17,7 +17,8 @@ export default function DashboardAppPage() {
   const [supplier, setSupplier] = useState(0);
   const [category, setCategory] = useState(0);
   const getInputStatics = async () => await axiosClient.get('/api/statistics/input');
-  const getOutputStatics = async () => await axiosClient.get('/api/statistics/output');
+  const getOutputStatics = async (cateId, timeStart, timeEnd) =>
+    await axiosClient.get(`/api/statistics/output?category=${cateId}&created_at=${timeStart}%26%26${timeEnd}`);
   const getUser = async () => await axiosClient.get('/api/users');
   const getCate = async () => await axiosClient.get('/api/categories');
 
@@ -28,7 +29,7 @@ export default function DashboardAppPage() {
   }, []);
 
   useEffect(() => {
-    getOutputStatics().then((res) => console.log(res));
+    getOutputStatics(2, '2023-05-01', '2023-06-01').then((res) => console.log(res));
   }, []);
 
   useEffect(() => {
@@ -79,7 +80,20 @@ export default function DashboardAppPage() {
           <Grid item xs={12} md={6} lg={8}>
             <AppWebsiteVisits
               title="Doanh thu theo tháng"
-              chartLabels={['01/01/2023', '02/02/2023', '03/03/2023', '04/04/2023', '05/05/2023']}
+              chartLabels={[
+                '01/2023',
+                '02/2023',
+                '03/2023',
+                '04/2023',
+                '05/2023',
+                '06/2023',
+                '07/2023',
+                '08/2023',
+                '09/2023',
+                '10/2023',
+                '11/2023',
+                '12/2023',
+              ]}
               chartData={[
                 {
                   name: 'Sắt',
@@ -93,12 +107,12 @@ export default function DashboardAppPage() {
                   fill: 'gradient',
                   data: [44, 55, 41, 67, 22],
                 },
-                // {
-                //   name: 'Nhôm',
-                //   type: 'area',
-                //   fill: 'gradient',
-                //   data: [44, 55, 41, 67, 22],
-                // },
+                {
+                  name: 'Nhôm',
+                  type: 'area',
+                  fill: 'gradient',
+                  data: [44, 55, 41, 67, 22],
+                },
                 {
                   name: 'Tôn',
                   type: 'line',
@@ -119,6 +133,52 @@ export default function DashboardAppPage() {
                 { label: 'Nhôm', value: 0 },
               ]}
               chartColors={[theme.palette.primary.main, theme.palette.warning.main, theme.palette.error.main]}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6} lg={8}>
+            <AppWebsiteVisits
+              title="Doanh thu theo nhà cung cấp"
+              chartLabels={[
+                '01/2023',
+                '02/2023',
+                '03/2023',
+                '04/2023',
+                '05/2023',
+                '06/2023',
+                '07/2023',
+                '08/2023',
+                '09/2023',
+                '10/2023',
+                '11/2023',
+                '12/2023',
+              ]}
+              chartData={[
+                {
+                  name: 'Sắt',
+                  type: 'column',
+                  fill: 'solid',
+                  data: [23, 11, 22, 27, 13],
+                },
+                {
+                  name: 'Thép',
+                  type: 'column',
+                  fill: 'gradient',
+                  data: [44, 55, 41, 67, 22],
+                },
+                {
+                  name: 'Nhôm',
+                  type: 'area',
+                  fill: 'gradient',
+                  data: [44, 55, 41, 67, 22],
+                },
+                {
+                  name: 'Tôn',
+                  type: 'line',
+                  fill: 'solid',
+                  data: [30, 25, 36, 30, 45],
+                },
+              ]}
             />
           </Grid>
 

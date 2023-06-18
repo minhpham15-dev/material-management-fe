@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { axiosClient } from '../utils/axiosClient';
-import { Helmet } from 'react-helmet-async';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { FormContainer, RadioButtonGroup, TextFieldElement } from 'react-hook-form-mui';
+import { fDate } from '../utils/formatTime';
 
 const columns = [
   { field: 'id', headerName: 'ID Sản phẩm', flex: 1 },
@@ -27,13 +27,17 @@ const DetailInputInvoice = ({ data, setOpenModal }) => {
       deliver_name: currentSupplier?.deliver_name || '',
       deliver_phone: currentSupplier?.deliver_phone || '',
       payment_method: currentSupplier?.payment_method || '',
+      user: currentSupplier?.user.name || '',
+      created_at: fDate(currentSupplier?.created_at) || '',
     },
   });
   useEffect(() => {
     formContext.setValue('supplier_id', currentSupplier?.supplier.name || '');
     formContext.setValue('deliver_name', currentSupplier?.deliver_name || '');
     formContext.setValue('deliver_phone', currentSupplier?.deliver_phone || '');
-    formContext.setValue('payment_method', '1' || '');
+    formContext.setValue('user', currentSupplier?.user.name || '');
+    formContext.setValue('created_at', fDate(currentSupplier?.created_at) || '');
+    formContext.setValue('payment_method', currentSupplier?.payment_method === 'Tiền mặt' ? 1 : 2 || '');
   }, [currentSupplier]);
   useEffect(() => {
     if (currentSupplier?.details) {
@@ -44,7 +48,7 @@ const DetailInputInvoice = ({ data, setOpenModal }) => {
             id: v.commodity.specification.product.id,
             name: v.commodity.specification.product.name,
             vat: v.commodity.specification.product.tax,
-            amount: v.commodity.current_amount,
+            amount: v.amount,
             price: v.commodity.specification.price,
             unit: res.data.data.name,
           };
@@ -64,10 +68,7 @@ const DetailInputInvoice = ({ data, setOpenModal }) => {
         borderRadius: '5px',
       }}
     >
-      <Helmet>
-        <title> Chi tiết hoá đơn nhập | Material Management </title>
-      </Helmet>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} ml mt>
         <Grid xs={8}>
           <>
             <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
@@ -84,6 +85,7 @@ const DetailInputInvoice = ({ data, setOpenModal }) => {
                     paginationModel: { page: 0, pageSize: 5 },
                   },
                 }}
+                pageSizeOptions={[5, 10]}
                 hideFooter={true}
               />
             </Box>
@@ -125,17 +127,25 @@ const DetailInputInvoice = ({ data, setOpenModal }) => {
                 disabled
                 options={[
                   {
-                    id: '1',
+                    id: 1,
                     label: 'Tiền mặt',
                   },
                   {
-                    id: '2',
-                    label: 'CK Ngân hàng',
+                    id: 2,
+                    label: 'Chuyển khoản',
                   },
                 ]}
               />
             </Stack>
             <h3>Tổng tiền: {currentSupplier?.total} VND</h3>
+          </FormContainer>
+        </Grid>
+        <Grid xs={4} mt={3}>
+          <FormContainer formContext={formContext}>
+            <Stack spacing={2} direction="row">
+              <TextFieldElement name="created_at" label="Ngày tạo" disabled />
+              <TextFieldElement name="user" label="Nhân viên nhập hàng" disabled />
+            </Stack>
           </FormContainer>
         </Grid>
       </Grid>
